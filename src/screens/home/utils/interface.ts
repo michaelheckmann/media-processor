@@ -1,11 +1,11 @@
-import { GenerationConfig } from "../components/Sidebar";
+import { TransformationConfig } from "../components/Sidebar";
 
 declare global {
   interface Window {
     electronAPI: {
-      generate: (
+      transformMedia: (
         filePath: string,
-        config: GenerationConfig
+        config: TransformationConfig
       ) => Promise<boolean>;
       handleProgress: (
         callback: (event: Electron.IpcRendererEvent, progress?: number) => void

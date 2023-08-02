@@ -5,19 +5,20 @@ type SideBarOptions<T> = Array<{
 
 export type TaskOption =
   | ""
-  | "reduce"
+  | "compress"
   | "transcribe"
   | "anonymize"
   | "ner"
   | "upload";
+
 export const TASKS: SideBarOptions<TaskOption> = [
   {
     label: "Choose a task",
     value: "",
   },
   {
-    label: "Video reduction",
-    value: "reduce",
+    label: "Video compression",
+    value: "compress",
   },
   {
     label: "Transcription",
@@ -38,6 +39,7 @@ export const TASKS: SideBarOptions<TaskOption> = [
 ];
 
 export type CompressionOption = "low" | "medium" | "high";
+
 export const COMPRESSIONS: SideBarOptions<CompressionOption> = [
   {
     label: "Low",

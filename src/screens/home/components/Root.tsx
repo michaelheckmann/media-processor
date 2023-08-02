@@ -2,13 +2,13 @@ import { useState } from "react";
 import { setDefaultGradient, setSuccessGradient } from "../utils/gradients";
 import { Header } from "./Header";
 import { Main } from "./Main";
-import { GenerationConfig, Sidebar } from "./Sidebar";
+import { Sidebar, TransformationConfig } from "./Sidebar";
 
 export const Root = () => {
   const [file, setFile] = useState<File | null>(null);
 
-  const onGenerate = async (config: GenerationConfig) => {
-    const success = await window.electronAPI.generate(file.path, config);
+  const onGenerate = async (config: TransformationConfig) => {
+    const success = await window.electronAPI.transformMedia(file.path, config);
     if (success) {
       setSuccessGradient();
     } else {

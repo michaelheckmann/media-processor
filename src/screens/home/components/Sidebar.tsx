@@ -8,7 +8,7 @@ import {
   TaskOption,
 } from "../utils/sidebarOptions";
 
-export type GenerationConfig = {
+export type TransformationConfig = {
   task: TaskOption;
   language: string;
   compression: CompressionOption;
@@ -16,11 +16,11 @@ export type GenerationConfig = {
 
 type Props = {
   file: File | null;
-  onGenerate: (config: GenerationConfig) => void;
+  onGenerate: (config: TransformationConfig) => void;
 };
 
 export const Sidebar = ({ file, onGenerate }: Props) => {
-  const [config, setConfig] = useState<GenerationConfig>({
+  const [config, setConfig] = useState<TransformationConfig>({
     task: "",
     language: "de",
     compression: "medium",
@@ -28,11 +28,11 @@ export const Sidebar = ({ file, onGenerate }: Props) => {
 
   const showOptions = config.task !== "";
   const showLanguage = config.task === "transcribe" || config.task === "ner";
-  const showCompression = config.task === "reduce";
+  const showCompression = config.task === "compress";
 
   const disableButton = !file || !showOptions;
 
-  const onConfigChange = (key: keyof GenerationConfig, value: string) => {
+  const onConfigChange = (key: keyof TransformationConfig, value: string) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
   };
 
