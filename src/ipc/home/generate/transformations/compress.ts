@@ -71,16 +71,21 @@ const compressFile = (
   pathOut: string,
   config: TransformationConfig
 ) => {
+  let totalTime = 0;
+
   const mimeType = lookup(pathIn);
   const isAudioFile = mimeType && mimeType?.includes("audio");
-  const compressionCommand = isAudioFile
+  let ffmpegCommand = isAudioFile
     ? compressAudio(pathIn, config)
     : compressVideo(pathIn, config);
 
-  let totalTime = 0;
+  ffmpegCommand =
+    config.trimTo === ""
+      ? ffmpegCommand
+      : ffmpegCommand.setDuration(config.trimTo);
 
   return new Promise<void>((resolve, reject) => {
-    compressionCommand
+    ffmpegCommand
       .on("codecData", (data) => {
         totalTime = parseInt(data.duration.replace(/:/g, ""));
       })
@@ -94,17 +99,17 @@ const compressFile = (
 /**
  * The `compressTransformation` function compresses a file using a specified configuration and opens
  * the compressed file.
- * @param {string} filePath - The `filePath` parameter is a string that represents the path to the file
+ * @param {string} pathIn - The `filePath` parameter is a string that represents the path to the file
  * that needs to be compressed.
  * @param {TransformationConfig} config - The `config` parameter is an object of type `GenerationConfig`.
  * It contains configuration options for the compression process. The specific properties and their
  * meanings would depend on the implementation of the `reduceFile` function.
  */
 export const compressTransformation = async (
-  filePath: string,
+  pathIn: string,
   config: TransformationConfig
 ) => {
-  const pathOut = getOutFilePath(filePath, "compressed");
-  await compressFile(filePath, pathOut, config);
+  const pathOut = getOutFilePath(pathIn, "compressed");
+  await compressFile(pathIn, pathOut, config);
   spawnSync("open", [pathOut]);
 };

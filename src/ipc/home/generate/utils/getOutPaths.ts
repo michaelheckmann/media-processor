@@ -10,10 +10,12 @@ import path from "path";
 const getStrippedFileName = (filePath: string) => {
   const fileName = path.basename(filePath);
   const fileExtension = path.extname(filePath);
-  return fileName
-    .replace(fileExtension, "")
-    .replace(/\s*\[.*?\]\s*/g, "")
-    .trim();
+  return fileName.replace(fileExtension, "").trim();
+};
+
+const anonymizeFileName = (filePath: string, anonymization?: string) => {
+  if (!anonymization) return filePath;
+  return filePath.replace(anonymization, "XXX");
 };
 
 /**
@@ -64,12 +66,19 @@ export const getOutDirPath = (filePath: string, subFolder?: string) => {
  * @returns the output file path, which is a combination of the output directory path and the new file
  * name.
  */
-export const getOutFilePath = (filePath: string, extension: string) => {
+export const getOutFilePath = (
+  filePath: string,
+  extension: string,
+  anonymization?: string
+) => {
   const ourDirectory = getOutDirPath(filePath);
 
   const fileName = getStrippedFileName(filePath);
   const fileExtension = path.extname(filePath);
-  const newFileName = fileName + ` [${extension}]` + fileExtension;
+  const newFileName =
+    anonymizeFileName(fileName, anonymization) +
+    ` [${extension}]` +
+    fileExtension;
 
   return ourDirectory + "/" + newFileName;
 };

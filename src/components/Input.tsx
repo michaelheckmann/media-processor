@@ -3,9 +3,9 @@ import { InputWrapper, InputWrapperProps } from "./InputWrapper";
 
 type Props = InputHTMLAttributes<HTMLInputElement> & InputWrapperProps;
 
-export const Input = ({ label, link, optional, ...rest }: Props) => {
+export const Input = ({ label, link, optional, tooltip, ...rest }: Props) => {
   return (
-    <InputWrapper {...{ label, link, optional }}>
+    <InputWrapper {...{ label, link, tooltip, optional }}>
       <input {...rest} />
     </InputWrapper>
   );

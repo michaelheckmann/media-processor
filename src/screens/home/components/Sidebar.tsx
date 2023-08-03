@@ -2,6 +2,8 @@ import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
 import { Dispatch, SetStateAction } from "react";
 import {
+  ANONYMIZATIONS,
+  AnonymizationStrengthOption,
   COMPRESSIONS,
   CompressionOption,
   MODELS,
@@ -13,9 +15,12 @@ import { ProcessingState } from "./Root";
 
 export type TransformationConfig = {
   task: TaskOption;
+  trimTo: string;
   language: string;
   compression: CompressionOption;
   model: ModelOption;
+  anonymizationStrength: AnonymizationStrengthOption;
+  anonymizeFileName: string;
 };
 
 type Props = {
@@ -33,12 +38,23 @@ export const Sidebar = ({
   onGenerate,
   processingState,
 }: Props) => {
-  const { task, language, compression, model } = config;
+  const {
+    task,
+    trimTo,
+    language,
+    compression,
+    model,
+    anonymizationStrength,
+    anonymizeFileName,
+  } = config;
 
   const showOptions = task !== "";
+  const showTrimTo = task === "compress" || task === "anonymize";
   const showLanguage = task === "transcribe" || task === "ner";
   const showCompression = task === "compress";
   const showModel = task === "transcribe";
+  const showAnonymizationStrength = task === "anonymize";
+  const showAnonymizeFileName = task === "anonymize";
 
   const disableButton =
     processingState === "processing" ||
@@ -70,7 +86,24 @@ export const Sidebar = ({
       {showOptions && (
         <>
           <div className="border-dashed border-b-1 border-stone-700">
-            <div className="flex flex-col gap-4 px-4 mb-6">
+            <div className="flex flex-col gap-6 px-4 mb-6">
+              {showTrimTo && (
+                <Input
+                  label="Trim to (seconds)"
+                  type="number"
+                  min={1}
+                  optional
+                  placeholder="Enter a number"
+                  value={trimTo}
+                  onChange={({ target }) => {
+                    const isEmpty = target.value === "";
+                    const number = Number(target.value);
+                    if (isEmpty || number > 0) {
+                      onConfigChange("trimTo", target.value);
+                    }
+                  }}
+                />
+              )}
               {showLanguage && (
                 <Input
                   label="Language"
@@ -102,6 +135,29 @@ export const Sidebar = ({
                   value={model}
                   onChange={({ target }) =>
                     onConfigChange("model", target.value)
+                  }
+                />
+              )}
+              {showAnonymizationStrength && (
+                <Select
+                  label="Anonymization Strength"
+                  options={ANONYMIZATIONS}
+                  value={anonymizationStrength}
+                  onChange={({ target }) =>
+                    onConfigChange("anonymizationStrength", target.value)
+                  }
+                />
+              )}
+              {showAnonymizeFileName && (
+                <Input
+                  label="Anonymize Filename"
+                  type="text"
+                  optional
+                  placeholder="Enter a text"
+                  tooltip="Enter the text you want to anonymize in the file name. Entering a text like 'michael' will turn a filname like 'michael__001.mp4' into 'blue_flamingo__001.mp4'"
+                  value={anonymizeFileName}
+                  onChange={({ target }) =>
+                    onConfigChange("anonymizeFileName", target.value)
                   }
                 />
               )}

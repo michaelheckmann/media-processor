@@ -79,6 +79,12 @@ select {
   background-position-y: 2px;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .mesh-gradient {
   background-color: var(--gradient-default-1);
   background-image: radial-gradient(

@@ -10,9 +10,12 @@ export const Root = () => {
   const [file, setFile] = useState<File | null>(null);
   const [config, setConfig] = useState<TransformationConfig>({
     task: "",
+    trimTo: "",
     language: "de",
     compression: "medium",
     model: "whisper-large",
+    anonymizationStrength: "medium",
+    anonymizeFileName: "",
   });
 
   const [processingState, setProcessingState] =

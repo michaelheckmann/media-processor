@@ -10,7 +10,6 @@ export type TaskOption =
   | "anonymize"
   | "ner"
   | "upload";
-
 export const TASKS: SideBarOptions<TaskOption> = [
   {
     label: "Choose a task",
@@ -39,7 +38,6 @@ export const TASKS: SideBarOptions<TaskOption> = [
 ];
 
 export type CompressionOption = "low" | "medium" | "high";
-
 export const COMPRESSIONS: SideBarOptions<CompressionOption> = [
   {
     label: "Low",
@@ -56,7 +54,6 @@ export const COMPRESSIONS: SideBarOptions<CompressionOption> = [
 ];
 
 export type ModelOption = "whisper-large" | "nova";
-
 export const MODELS: SideBarOptions<ModelOption> = [
   {
     label: "Whisper",
@@ -65,5 +62,21 @@ export const MODELS: SideBarOptions<ModelOption> = [
   {
     label: "Nova",
     value: "nova",
+  },
+];
+
+export type AnonymizationStrengthOption = "low" | "medium" | "high";
+export const ANONYMIZATIONS: SideBarOptions<AnonymizationStrengthOption> = [
+  {
+    label: "Low",
+    value: "low",
+  },
+  {
+    label: "Medium",
+    value: "medium",
+  },
+  {
+    label: "High",
+    value: "high",
   },
 ];
