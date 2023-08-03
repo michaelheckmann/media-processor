@@ -54,3 +54,16 @@ export const COMPRESSIONS: SideBarOptions<CompressionOption> = [
     value: "high",
   },
 ];
+
+export type ModelOption = "whisper-large" | "nova";
+
+export const MODELS: SideBarOptions<ModelOption> = [
+  {
+    label: "Whisper",
+    value: "whisper-large",
+  },
+  {
+    label: "Nova",
+    value: "nova",
+  },
+];

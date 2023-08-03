@@ -1,3 +1,4 @@
+import { ElectronStoreKey } from "@/ipc/shared/electronStoreKey";
 import { TransformationConfig } from "../components/Sidebar";
 
 declare global {
@@ -12,8 +13,8 @@ declare global {
       ) => void;
       openSettings: () => void;
       store: {
-        get: (key: string) => string;
-        set: (key: string, val: string) => void;
+        get: (key: ElectronStoreKey) => string;
+        set: (key: ElectronStoreKey, val: string) => void;
       };
       openLink: (url: string) => void;
     };

@@ -5,14 +5,18 @@ import { contextBridge, ipcRenderer } from "electron";
 import { TransformationConfig } from "./components/Sidebar";
 
 contextBridge.exposeInMainWorld("electronAPI", {
-  transformMedia: (filePath: string, config: TransformationConfig) =>
-    ipcRenderer.invoke("transform-media", filePath, config),
+  transformMedia: (filePath: string, config: TransformationConfig) => {
+    return ipcRenderer.invoke("transform-media", filePath, config);
+  },
   handleProgress: (
-    callback: (
-      event: Electron.IpcRendererEvent,
-      progress?: number | null
-    ) => void
-  ) => ipcRenderer.on("progress", callback),
-  openSettings: () => ipcRenderer.invoke("open-settings"),
-  openLink: (url: string) => ipcRenderer.invoke("open-link", url),
+    cb: (event: Electron.IpcRendererEvent, progress?: number | null) => void
+  ) => {
+    return ipcRenderer.on("progress", cb);
+  },
+  openSettings: () => {
+    return ipcRenderer.invoke("open-settings");
+  },
+  openLink: (url: string) => {
+    return ipcRenderer.invoke("open-link", url);
+  },
 });

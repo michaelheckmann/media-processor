@@ -1,5 +1,5 @@
+import { TransformationConfig } from "@/screens/home/components/Sidebar";
 import { IpcMainInvokeEvent, Notification } from "electron";
-import { TransformationConfig } from "../../../screens/home/components/Sidebar";
 import { compressTransformation } from "./transformations/compress";
 import { transcribeTransformation } from "./transformations/transcribe";
 import "./utils/setupFFMPEG";
@@ -15,8 +15,9 @@ export const transformMedia = async (
     if (config.task === "compress") {
       await compressTransformation(filePath, config);
     } else if (config.task === "transcribe") {
-      await transcribeTransformation();
+      await transcribeTransformation(filePath, config);
     }
+
     new Notification({
       title: "Success",
       body: "Your file has been generated!",
@@ -24,9 +25,12 @@ export const transformMedia = async (
     return true;
   } catch (error) {
     console.error(error);
+    const title = `Error while completing task: ${config.task}`;
+    const body =
+      error.message || "Something went wrong while generating your file.";
     new Notification({
-      title: "Error",
-      body: "Something went wrong while generating your file.",
+      title,
+      body,
     }).show();
     return false;
   }

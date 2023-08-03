@@ -1,5 +1,5 @@
 import { bins, paths } from "ffmpeg-static-electron-forge";
-import ffmpeg from "fluent-ffmpeg";
+import { setFfmpegPath, setFfprobePath } from "fluent-ffmpeg";
 import fs from "fs";
 import path from "path";
 
@@ -24,5 +24,5 @@ fs.chmodSync(ffmpegPath, 0o755);
 fs.chmodSync(ffprobePath, 0o755);
 
 //tell the ffmpeg package where it can find the needed binaries.
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
+setFfmpegPath(ffmpegPath);
+setFfprobePath(ffprobePath);

@@ -1,61 +1,95 @@
+import { TransformationConfig } from "@/screens/home/components/Sidebar";
 import { spawnSync } from "child_process";
 import ffmpeg from "fluent-ffmpeg";
-import { mainWindow } from "../../../../../src";
-import { TransformationConfig } from "../../../../screens/home/components/Sidebar";
-import { getOutFileName } from "../utils/getOutFileName";
+import { lookup } from "mime-types";
+import { onEnd, onError, onProgress } from "../utils/ffmpegOptions";
+import { getOutFilePath } from "../utils/getOutPaths";
 
 /**
- * The `reduceFile` function takes an input file path, an output file path, a configuration object, and
- * a main window object, and uses FFmpeg to reduce the size of the video file based on the compression
- * level specified in the configuration object, while providing progress updates to the main window.
- * @param {string} pathIn - The `pathIn` parameter is a string that represents the input file path. It
- * is the path of the file that needs to be reduced or compressed.
- * @param {string} pathOut - The `pathOut` parameter is a string that represents the output file path
- * where the reduced file will be saved.
- * @param {TransformationConfig} config - The `config` parameter is an object of type `GenerationConfig`
- * which contains configuration options for the file reduction process.
- * @returns a Promise of type void.
+ * The compressAudio function takes a file path and a configuration object, and returns a compressed
+ * audio file using the specified compression level.
+ * @param {string} pathIn - The `pathIn` parameter is a string that represents the path or location of
+ * the audio file that needs to be compressed.
+ * @param {TransformationConfig} config - The `config` parameter is an object that contains the
+ * configuration for the audio compression. It has a property called `compression` which specifies the
+ * desired level of compression. The possible values for `config.compression` are "low", "medium", or
+ * "high".
+ * @returns The function `compressAudio` is returning the result of calling the `audioBitrate` method
+ * on the `ffmpeg` object, passing in the `compression` value as the argument.
  */
-export function reduceFile(
+const compressAudio = (pathIn: string, config: TransformationConfig) => {
+  const compressionMap = {
+    low: "64k",
+    medium: "96k",
+    high: "128k",
+  };
+  const compression = compressionMap[config.compression];
+  return ffmpeg(pathIn).audioBitrate(compression);
+};
+
+/**
+ * The compressVideo function takes a video file path and a configuration object, and uses FFmpeg to
+ * compress the video with a specified compression level.
+ * @param {string} pathIn - The `pathIn` parameter is a string that represents the path to the input
+ * video file that needs to be compressed.
+ * @param {TransformationConfig} config - The `config` parameter is an object that contains the
+ * configuration for the video compression. It has a property called `compression` which specifies the
+ * level of compression to be applied to the video. The possible values for `config.compression` are
+ * "low", "medium", or "high".
+ * @returns The function `compressVideo` returns a ffmpeg command that compresses a video file using
+ * the specified path and configuration.
+ */
+const compressVideo = (pathIn: string, config: TransformationConfig) => {
+  const compressionMap = {
+    low: 4,
+    medium: 8,
+    high: 16,
+  };
+  const compression = compressionMap[config.compression];
+
+  return ffmpeg(pathIn)
+    .videoFilter(`scale=trunc(iw/${compression})*2:trunc(ih/${compression})*2`)
+    .outputOptions(["-vcodec libx264", "-preset ultrafast"]);
+};
+
+/**
+ * The `compressFile` function compresses a file (either audio or video) based on the provided
+ * configuration and saves it to the specified output path.
+ * @param {string} pathIn - The `pathIn` parameter is a string that represents the path to the input
+ * file that needs to be compressed.
+ * @param {string} pathOut - The `pathOut` parameter is a string that represents the output path where
+ * the compressed file will be saved.
+ * @param {TransformationConfig} config - The `config` parameter is an object that contains the
+ * configuration settings for the compression process. It likely includes properties such as bitrate,
+ * resolution, quality, or any other relevant settings specific to the compression algorithm being used
+ * for audio or video files. The specific properties and their values would depend on the
+ * implementation of
+ * @returns The function `compressFile` returns a Promise that resolves to `void`.
+ */
+const compressFile = (
   pathIn: string,
   pathOut: string,
   config: TransformationConfig
-) {
+) => {
+  const mimeType = lookup(pathIn);
+  const isAudioFile = mimeType && mimeType?.includes("audio");
+  const compressionCommand = isAudioFile
+    ? compressAudio(pathIn, config)
+    : compressVideo(pathIn, config);
+
   let totalTime = 0;
-  let compression = 8;
-  if (config.compression === "low") {
-    compression = 4;
-  } else if (config.compression === "high") {
-    compression = 16;
-  }
 
   return new Promise<void>((resolve, reject) => {
-    ffmpeg(pathIn)
-      .videoFilter(
-        `scale=trunc(iw/${compression})*2:trunc(ih/${compression})*2`
-      )
-      .outputOptions(["-vcodec libx264", "-preset ultrafast"])
+    compressionCommand
       .on("codecData", (data) => {
         totalTime = parseInt(data.duration.replace(/:/g, ""));
       })
-      .on("progress", (progress) => {
-        const time = parseInt(progress.timemark.replace(/:/g, ""));
-        const percent = (time / totalTime) * 100;
-        mainWindow.webContents.send("progress", percent);
-        console.info(`[ffmpeg] progress: ${Math.round(percent)}%`);
-      })
-      .on("error", (err) => {
-        console.error(`[ffmpeg] error: ${err.message}`);
-        reject(err);
-      })
-      .on("end", () => {
-        mainWindow.webContents.send("progress", null);
-        console.log("[ffmpeg] finished");
-        resolve();
-      })
+      .on("progress", (progress) => onProgress(progress, totalTime))
+      .on("error", (err) => onError(err, reject))
+      .on("end", () => onEnd(resolve))
       .save(pathOut);
   });
-}
+};
 
 /**
  * The `compressTransformation` function compresses a file using a specified configuration and opens
@@ -70,7 +104,7 @@ export const compressTransformation = async (
   filePath: string,
   config: TransformationConfig
 ) => {
-  const compressedFilePath = getOutFileName(filePath, "compressed");
-  await reduceFile(filePath, compressedFilePath, config);
-  spawnSync("open", [compressedFilePath]);
+  const pathOut = getOutFilePath(filePath, "compressed");
+  await compressFile(filePath, pathOut, config);
+  spawnSync("open", [pathOut]);
 };

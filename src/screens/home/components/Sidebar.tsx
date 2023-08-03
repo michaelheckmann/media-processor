@@ -1,36 +1,50 @@
-import { useState } from "react";
-import { Input } from "../../../components/Input";
-import { Select } from "../../../components/Select";
+import { Input } from "@/components/Input";
+import { Select } from "@/components/Select";
+import { Dispatch, SetStateAction } from "react";
 import {
   COMPRESSIONS,
   CompressionOption,
+  MODELS,
+  ModelOption,
   TASKS,
   TaskOption,
 } from "../utils/sidebarOptions";
+import { ProcessingState } from "./Root";
 
 export type TransformationConfig = {
   task: TaskOption;
   language: string;
   compression: CompressionOption;
+  model: ModelOption;
 };
 
 type Props = {
   file: File | null;
+  config: TransformationConfig;
+  setConfig: Dispatch<SetStateAction<TransformationConfig>>;
   onGenerate: (config: TransformationConfig) => void;
+  processingState: ProcessingState;
 };
 
-export const Sidebar = ({ file, onGenerate }: Props) => {
-  const [config, setConfig] = useState<TransformationConfig>({
-    task: "",
-    language: "de",
-    compression: "medium",
-  });
+export const Sidebar = ({
+  file,
+  config,
+  setConfig,
+  onGenerate,
+  processingState,
+}: Props) => {
+  const { task, language, compression, model } = config;
 
-  const showOptions = config.task !== "";
-  const showLanguage = config.task === "transcribe" || config.task === "ner";
-  const showCompression = config.task === "compress";
+  const showOptions = task !== "";
+  const showLanguage = task === "transcribe" || task === "ner";
+  const showCompression = task === "compress";
+  const showModel = task === "transcribe";
 
-  const disableButton = !file || !showOptions;
+  const disableButton =
+    processingState === "processing" ||
+    !file ||
+    !showOptions ||
+    (language !== "en" && model === "nova");
 
   const onConfigChange = (key: keyof TransformationConfig, value: string) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
@@ -47,7 +61,7 @@ export const Sidebar = ({ file, onGenerate }: Props) => {
           <Select
             label="Task"
             options={TASKS}
-            value={config.task}
+            value={task}
             onChange={({ target }) => onConfigChange("task", target.value)}
           />
         </div>
@@ -60,11 +74,11 @@ export const Sidebar = ({ file, onGenerate }: Props) => {
               {showLanguage && (
                 <Input
                   label="Language"
-                  link="www.google.de"
+                  link="developers.deepgram.com/docs/languages-overview"
                   type="text"
                   placeholder="Enter a language code"
                   max={2}
-                  value={config.language}
+                  value={language}
                   onChange={({ target }) =>
                     onConfigChange("language", target.value)
                   }
@@ -74,9 +88,20 @@ export const Sidebar = ({ file, onGenerate }: Props) => {
                 <Select
                   label="Compression"
                   options={COMPRESSIONS}
-                  value={config.compression}
+                  value={compression}
                   onChange={({ target }) =>
                     onConfigChange("compression", target.value)
+                  }
+                />
+              )}
+              {showModel && (
+                <Select
+                  label="Model"
+                  link="developers.deepgram.com/docs/models-overview"
+                  options={MODELS}
+                  value={model}
+                  onChange={({ target }) =>
+                    onConfigChange("model", target.value)
                   }
                 />
               )}
@@ -84,7 +109,7 @@ export const Sidebar = ({ file, onGenerate }: Props) => {
           </div>
           <div className="px-4">
             <button onClick={onGenerateClick} disabled={disableButton}>
-              Generate
+              {processingState === "processing" ? "..." : "Generate"}
             </button>
           </div>
         </>

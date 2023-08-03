@@ -1,6 +1,5 @@
 import { ReactNode, useState } from "react";
 import ReactDropzone from "react-dropzone";
-import { setDefaultGradient } from "../utils/gradients";
 
 type Props = {
   handleDrop: (file: File) => void;
@@ -16,7 +15,6 @@ export const Dropzone = ({ handleDrop, children }: Props) => {
     } else {
       handleDrop(acceptedFiles[0]);
       setFileDropped(true);
-      setDefaultGradient();
     }
   };
 
