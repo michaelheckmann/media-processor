@@ -16,9 +16,7 @@ export const Root = () => {
     model: "whisper-large",
     anonymizationStrength: "medium",
     anonymizeFileName: "",
-    // TODO: Remove this default value
-    redactionConfigFile:
-      "/Users/michaelheckmann/Desktop/Neuer Ordner mit Objekten/in2 [processed]/transcription/dovetail [redacted].vtt",
+    redactionConfigFile: "",
   });
 
   const [processingState, setProcessingState] =

@@ -3,12 +3,32 @@ export const Header = () => {
     window.electronAPI.openSettings();
   };
 
+  const openEditor = () => {
+    window.electronAPI.openEditor();
+  };
+
   return (
     <div className="w-full flex items-center pl-24 pr-4 font-bold border-b-1 h-[3.2rem] border-stone-700 bg-stone-900/80 gap-2">
       <div className="flex-1 drag-header">
         <div>Media Processor</div>
       </div>
-      <div>
+      <div className="flex gap-2">
+        <button onClick={openEditor}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+            />
+          </svg>
+        </button>
         <button onClick={openSettings}>
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -12,6 +12,15 @@ type RedactionTimestamps = {
   end: number;
 }[];
 
+/**
+ * The `cleanRedactionConfig` function removes certain lines from a redaction configuration file and
+ * returns the modified file content as a string.
+ * @param {string} redactionConfigFileContent - The `redactionConfigFileContent` parameter is a string
+ * that represents the content of a redaction configuration file. This file contains multiple lines of
+ * text, where each line represents a rule or configuration for redacting certain information.
+ * @returns The function `cleanRedactionConfig` returns a string that represents the cleaned version of
+ * the `redactionConfigFileContent`.
+ */
 const cleanRedactionConfig = (redactionConfigFileContent: string) => {
   let newFile = "";
   const lines = redactionConfigFileContent.split("\n");
@@ -35,27 +44,39 @@ const cleanRedactionConfig = (redactionConfigFileContent: string) => {
   return newFile;
 };
 
+/**
+ * The function `getRedactionTimestamps` takes a redaction configuration string and  transcript JSON object, and returns an array of redaction timestamps based on the configuration.
+ * @param {string} redactionConfig - A string that represents the redaction configuration. It contains a series of words separated by spaces. Each word can have special characters to indicate the start and end of a redaction, as well as to indicate if a word should be replaced.
+ * @param {PrerecordedTranscriptionResponse} transcriptJSON - The `transcriptJSON` parameter is of type `PrerecordedTranscriptionResponse`. It represents the JSON response of  a prerecorded transcription.
+ * @returns an array of redaction timestamps.
+ */
 const getRedactionTimestamps = (
   redactionConfig: string,
   transcriptJSON: PrerecordedTranscriptionResponse
 ) => {
+  // Split the redaction config string into an array of words.
   const words = redactionConfig.split(" ");
+
+  // Get the transcription words from the transcript JSON object.
   const transcriptionsWords =
     transcriptJSON.results.channels[0].alternatives[0].words;
-  const redactionConfigArray: RedactionTimestamps = [];
 
+  // Initialize variables.
+  const redactionConfigArray: RedactionTimestamps = [];
   let wordIndex = 0;
   let redactionStart: number;
   let redactionEnd: number;
-
   let replacement = false;
 
+  // Loop through each word in the redaction config array.
   words.forEach((word) => {
+    // If the word contains "[", set the redaction start time.
     if (word.includes("[") && !redactionStart) {
       const transcriptionWord = transcriptionsWords[wordIndex];
       redactionStart = transcriptionWord.start;
     }
 
+    // If the word contains "]", set the redaction end time and add the redaction timestamps to the array.
     if (word.includes("]") && !redactionEnd) {
       const transcriptionWord = transcriptionsWords[wordIndex];
       redactionEnd = transcriptionWord.end;
@@ -69,26 +90,40 @@ const getRedactionTimestamps = (
       return;
     }
 
+    // If the word contains "(", set the replacement flag to true.
     if (word.includes("(")) {
       replacement = true;
       return;
     }
 
+    // If the word contains ")", set the replacement flag to false.
     if (word.includes(")")) {
       replacement = false;
       return;
     }
 
+    // If the replacement flag is true, skip the current word.
     if (replacement) {
       return;
     }
 
+    // Increment the word index.
     wordIndex++;
   });
 
+  // Return the redaction timestamps array.
   return redactionConfigArray;
 };
 
+/**
+ * The `getRedactedTranscript` function takes a transcript file content and a redaction configuration as input, and returns a redacted
+ * version of the transcript based on the configuration.
+ * @param {string} transcriptFileContent - The `transcriptFileContent` parameter is a string that represents the content of a transcript
+ * file. It contains the text of the transcript, with each line representing a different part of the transcript.
+ * @param {string} redactionConfig - The `redactionConfig` parameter is a string that contains the configuration for redacting certain words
+ * or phrases in the transcript. It specifies which words or phrases should be redacted and how they should be replaced.
+ * @returns The function `getRedactedTranscript` returns a redacted version of the transcript file content.
+ */
 const getRedactedTranscript = (
   transcriptFileContent: string,
   redactionConfig: string
@@ -170,6 +205,14 @@ const getRedactedTranscript = (
     .join("\n");
 };
 
+/**
+ * The function creates a redaction command based on a given configuration of timestamps.
+ * @param {RedactionTimestamps} redactionConfig - The `redactionConfig` parameter is an array of
+ * objects that contain the following properties:
+ * @returns The function `createRedactionCommand` returns an array of strings. Each string in the array
+ * represents a redaction command that can be used to redact audio timestamps based on the provided
+ * `redactionConfig`.
+ */
 function createRedactionCommand(redactionConfig: RedactionTimestamps) {
   return redactionConfig.map((config) => {
     const startMS = Math.floor(config.start * 1000);
@@ -182,6 +225,19 @@ function createRedactionCommand(redactionConfig: RedactionTimestamps) {
   });
 }
 
+/**
+ * The `redactAudio` function takes in an input audio file, applies redaction based on specified
+ * timestamps, and saves the modified audio to an output file.
+ * @param {string} pathIn - The `pathIn` parameter is a string that represents the path to the input
+ * audio file that needs to be redacted.
+ * @param {string} pathOut - The `pathOut` parameter is a string that represents the path where the
+ * redacted audio file will be saved.
+ * @param {RedactionTimestamps} redactionTimestamps - An object that contains the timestamps at which
+ * the audio should be redacted. It could have the following structure:
+ * @param {TransformationConfig} config - The `config` parameter is an object that contains various
+ * configuration options for the audio redaction process. It may have the following properties:
+ * @returns a Promise that resolves to void.
+ */
 const redactAudio = (
   pathIn: string,
   pathOut: string,
@@ -208,6 +264,15 @@ const redactAudio = (
       .save(pathOut);
   });
 };
+/**
+ * The `redactTransformation` function takes in a file path and a configuration object, reads and
+ * processes various files, performs audio redaction based on the configuration, and writes the
+ * redacted audio and transcript to new files.
+ * @param {string} pathIn - The `pathIn` parameter is a string that represents the input file path. It
+ * is the path to the file that needs to be redacted.
+ * @param {TransformationConfig} config - The `config` parameter is an object that contains the
+ * configuration for the redaction transformation. It includes the following properties:
+ */
 
 export const redactTransformation = async (
   pathIn: string,
@@ -222,7 +287,6 @@ export const redactTransformation = async (
     "utf8"
   );
   const redactionConfig = cleanRedactionConfig(redactionConfigFileContent);
-  console.log("redactionConfig:", redactionConfig);
 
   const deepgramResponseFileName = dirName + "/transcript.json";
   const deepgramResponseFileContent = readFileSync(

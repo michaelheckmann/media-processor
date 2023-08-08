@@ -16,6 +16,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openSettings: () => {
     return ipcRenderer.invoke("open-settings");
   },
+  openEditor: () => {
+    return ipcRenderer.invoke("open-editor");
+  },
   openRedactionConfig: (filePath: string) => {
     return ipcRenderer.invoke("open-redaction-config", filePath);
   },
