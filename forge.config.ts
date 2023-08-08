@@ -45,6 +45,14 @@ const config: ForgeConfig = {
               js: "./src/screens/settings/preload.ts",
             },
           },
+          {
+            html: "./src/screens/redactionConfig/index.html",
+            js: "./src/screens/redactionConfig/renderer.ts",
+            name: "redaction_config_window",
+            preload: {
+              js: "./src/screens/redactionConfig/preload.ts",
+            },
+          },
         ],
       },
     }),

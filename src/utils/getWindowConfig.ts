@@ -30,6 +30,14 @@ const modalConfig: BrowserWindowConstructorOptions = {
   ...sharedConfig,
 };
 
+const editorConfig: BrowserWindowConstructorOptions = {
+  height: 800,
+  minHeight: 400,
+  width: 1000,
+  minWidth: 400,
+  ...sharedConfig,
+};
+
 /**
  * The function `getWindowConfig` returns a configuration object for a browser window based on the
  * specified type, preload script, and optional options.
@@ -45,17 +53,22 @@ const modalConfig: BrowserWindowConstructorOptions = {
  * the specified type, preload script, and optional options.
  */
 export const getWindowConfig = (
-  type: "main" | "modal",
+  type: "main" | "modal" | "editor",
   preload: string,
   options?: BrowserWindowConstructorOptions
 ) => {
-  const config = type === "main" ? mainConfig : modalConfig;
+  const config = {
+    main: mainConfig,
+    modal: modalConfig,
+    editor: editorConfig,
+  }[type];
+
   return {
     ...config,
+    ...options,
     webPreferences: {
       preload,
-      ...config.webPreferences,
+      ...options?.webPreferences,
     },
-    ...options,
   };
 };

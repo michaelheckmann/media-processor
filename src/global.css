@@ -46,6 +46,8 @@ input {
     var(--ui-bg-end);
   background-color: var(--ui-bg-end);
 
+  user-select: none;
+
   cursor: default;
   transition: background-color 0.2s ease-in-out;
 
@@ -149,4 +151,32 @@ input::-webkit-inner-spin-button {
   100% {
     background-position: 50px 50px;
   }
+}
+
+.ck-editor {
+  --ck-color-base-background: transparent;
+  --ck-color-panel-background: transparent;
+  --ck-color-tooltip-background: transparent;
+  --ck-color-toolbar-background: transparent;
+  --ck-color-dropdown-panel-background: black;
+
+  --ck-color-text: #fff;
+
+  --ck-color-base-border: transparent;
+  --ck-color-panel-border: transparent;
+  --ck-color-tooltip-border: transparent;
+  --ck-color-toolbar-border: transparent;
+
+  --ck-font-face: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
+  --ck-focus-ring: 1px solid transparent;
+}
+
+.ck.ck-powered-by {
+  display: none;
+}
+
+.ck-content {
+  @apply flex-1 font-mono text-sm;
 }

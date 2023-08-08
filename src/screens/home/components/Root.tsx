@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { setDefaultGradient, setSuccessGradient } from "../utils/gradients";
 import { Header } from "./Header";
 import { Main } from "./Main";
@@ -16,6 +16,9 @@ export const Root = () => {
     model: "whisper-large",
     anonymizationStrength: "medium",
     anonymizeFileName: "",
+    // TODO: Remove this default value
+    redactionConfigFile:
+      "/Users/michaelheckmann/Desktop/Neuer Ordner mit Objekten/in2 [processed]/transcription/dovetail [redacted].vtt",
   });
 
   const [processingState, setProcessingState] =
@@ -38,6 +41,12 @@ export const Root = () => {
     setProcessingState("idle");
     setDefaultGradient();
   };
+
+  useEffect(() => {
+    window.electronAPI.handleRedactionConfigSaved((_, filePath: string) => {
+      setConfig((config) => ({ ...config, redactionConfigFile: filePath }));
+    });
+  }, []);
 
   return (
     <div className="flex flex-col w-full h-full">

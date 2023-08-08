@@ -1,6 +1,7 @@
 type SideBarOptions<T> = Array<{
   label: string;
   value: T;
+  disabled?: boolean;
 }>;
 
 export type TaskOption =
@@ -9,6 +10,7 @@ export type TaskOption =
   | "transcribe"
   | "anonymize"
   | "ner"
+  | "redact"
   | "upload";
 export const TASKS: SideBarOptions<TaskOption> = [
   {
@@ -30,10 +32,16 @@ export const TASKS: SideBarOptions<TaskOption> = [
   {
     label: "Entity recognition",
     value: "ner",
+    disabled: true,
+  },
+  {
+    label: "Redaction",
+    value: "redact",
   },
   {
     label: "S3 Upload",
     value: "upload",
+    disabled: true,
   },
 ];
 

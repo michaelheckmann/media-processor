@@ -84,7 +84,6 @@ export const InputWrapper = ({
           background: "black",
           borderRadius: "0.5rem",
           padding: "0.25rem 0.5rem",
-          opacity: 1,
           zIndex: 9999,
         }}
       >

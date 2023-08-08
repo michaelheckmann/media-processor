@@ -8,10 +8,13 @@ export const Root = () => {
   };
 
   useEffect(() => {
-    const key = window.electronAPI.store.get("deepgramKey");
-    if (key) {
-      setDeepgramKey(key);
-    }
+    const setup = async () => {
+      const key = await window.electronAPI.store.get("deepgramKey");
+      if (key) {
+        setDeepgramKey(key);
+      }
+    };
+    setup();
   }, []);
 
   return (

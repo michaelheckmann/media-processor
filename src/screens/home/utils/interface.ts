@@ -12,11 +12,19 @@ declare global {
         callback: (event: Electron.IpcRendererEvent, progress?: number) => void
       ) => void;
       openSettings: () => void;
+      openRedactionConfig: (filePath: string) => void;
       store: {
-        get: (key: ElectronStoreKey) => string;
+        get: (key: ElectronStoreKey) => Promise<string>;
         set: (key: ElectronStoreKey, val: string) => void;
       };
       openLink: (url: string) => void;
+      saveRedactionConfig: (
+        filePath: string,
+        fileContent: string
+      ) => Promise<boolean>;
+      handleRedactionConfigSaved: (
+        callback: (event: Electron.IpcRendererEvent, filePath: string) => void
+      ) => void;
     };
   }
 }

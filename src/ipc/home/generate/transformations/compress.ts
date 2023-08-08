@@ -75,16 +75,17 @@ const compressFile = (
 
   const mimeType = lookup(pathIn);
   const isAudioFile = mimeType && mimeType?.includes("audio");
-  let ffmpegCommand = isAudioFile
-    ? compressAudio(pathIn, config)
-    : compressVideo(pathIn, config);
-
-  ffmpegCommand =
-    config.trimTo === ""
-      ? ffmpegCommand
-      : ffmpegCommand.setDuration(config.trimTo);
 
   return new Promise<void>((resolve, reject) => {
+    let ffmpegCommand = isAudioFile
+      ? compressAudio(pathIn, config)
+      : compressVideo(pathIn, config);
+
+    ffmpegCommand =
+      config.trimTo === ""
+        ? ffmpegCommand
+        : ffmpegCommand.setDuration(config.trimTo);
+
     ffmpegCommand
       .on("codecData", (data) => {
         totalTime = parseInt(data.duration.replace(/:/g, ""));

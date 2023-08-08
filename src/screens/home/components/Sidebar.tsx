@@ -21,6 +21,7 @@ export type TransformationConfig = {
   model: ModelOption;
   anonymizationStrength: AnonymizationStrengthOption;
   anonymizeFileName: string;
+  redactionConfigFile: string;
 };
 
 type Props = {
@@ -46,6 +47,7 @@ export const Sidebar = ({
     model,
     anonymizationStrength,
     anonymizeFileName,
+    redactionConfigFile,
   } = config;
 
   const showOptions = task !== "";
@@ -55,11 +57,18 @@ export const Sidebar = ({
   const showModel = task === "transcribe";
   const showAnonymizationStrength = task === "anonymize";
   const showAnonymizeFileName = task === "anonymize";
+  const showRedactionConfig = task === "redact";
 
   const disableButton =
+    // Disable during processing
     processingState === "processing" ||
+    // Disable if there is no file
     !file ||
-    !showOptions ||
+    // Disable if there is no task
+    task === "" ||
+    // Disable if there is no reduaction config and task is redact
+    (!redactionConfigFile.length && task === "redact") ||
+    // Disable if the user tries to use the 'nova' model with a language other than 'en'
     (language !== "en" && model === "nova");
 
   const onConfigChange = (key: keyof TransformationConfig, value: string) => {
@@ -68,6 +77,10 @@ export const Sidebar = ({
 
   const onGenerateClick = () => {
     onGenerate(config);
+  };
+
+  const onOpenRedactionConfig = () => {
+    window.electronAPI.openRedactionConfig(redactionConfigFile);
   };
 
   return (
@@ -86,7 +99,7 @@ export const Sidebar = ({
       {showOptions && (
         <>
           <div className="border-dashed border-b-1 border-stone-700">
-            <div className="flex flex-col gap-6 px-4 mb-6">
+            <div className="flex flex-col gap-6 px-4 mb-4">
               {showTrimTo && (
                 <Input
                   label="Trim to (seconds)"
@@ -160,6 +173,11 @@ export const Sidebar = ({
                     onConfigChange("anonymizeFileName", target.value)
                   }
                 />
+              )}
+              {showRedactionConfig && (
+                <button onClick={onOpenRedactionConfig}>
+                  Edit Redaction Config
+                </button>
               )}
             </div>
           </div>
