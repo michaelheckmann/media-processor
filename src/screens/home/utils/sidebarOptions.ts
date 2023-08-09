@@ -9,9 +9,8 @@ export type TaskOption =
   | "compress"
   | "transcribe"
   | "anonymize"
-  | "ner"
   | "redact"
-  | "upload";
+  | "export";
 export const TASKS: SideBarOptions<TaskOption> = [
   {
     label: "Choose a task",
@@ -30,18 +29,12 @@ export const TASKS: SideBarOptions<TaskOption> = [
     value: "anonymize",
   },
   {
-    label: "Entity recognition",
-    value: "ner",
-    disabled: true,
-  },
-  {
     label: "Redaction",
     value: "redact",
   },
   {
-    label: "S3 Upload",
-    value: "upload",
-    disabled: true,
+    label: "Export",
+    value: "export",
   },
 ];
 
@@ -86,5 +79,18 @@ export const ANONYMIZATIONS: SideBarOptions<AnonymizationStrengthOption> = [
   {
     label: "High",
     value: "high",
+  },
+];
+
+export type ExportOption = "notion" | "s3";
+export const EXPORTS: SideBarOptions<ExportOption> = [
+  {
+    label: "Notion",
+    value: "notion",
+  },
+  {
+    label: "AWS S3",
+    value: "s3",
+    disabled: true,
   },
 ];

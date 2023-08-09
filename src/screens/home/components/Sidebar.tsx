@@ -1,16 +1,20 @@
 import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
+import { isMediaFile } from "@/utils/isMediaFile";
 import { Dispatch, SetStateAction } from "react";
 import {
   ANONYMIZATIONS,
   AnonymizationStrengthOption,
   COMPRESSIONS,
   CompressionOption,
+  EXPORTS,
+  ExportOption,
   MODELS,
   ModelOption,
   TASKS,
   TaskOption,
 } from "../utils/sidebarOptions";
+import { isValidSpeakerMap } from "../utils/transformSpeakerMap";
 import { ProcessingState } from "./Root";
 
 export type TransformationConfig = {
@@ -22,6 +26,8 @@ export type TransformationConfig = {
   anonymizationStrength: AnonymizationStrengthOption;
   anonymizeFileName: string;
   redactionConfigFile: string;
+  exportOption: ExportOption;
+  speakerMap: string;
 };
 
 type Props = {
@@ -48,30 +54,44 @@ export const Sidebar = ({
     anonymizationStrength,
     anonymizeFileName,
     redactionConfigFile,
+    exportOption,
+    speakerMap,
   } = config;
 
   const showOptions = task !== "";
   const showTrimTo = task === "compress" || task === "anonymize";
-  const showLanguage = task === "transcribe" || task === "ner";
+  const showLanguage = task === "transcribe";
   const showCompression = task === "compress";
   const showModel = task === "transcribe";
   const showAnonymizationStrength = task === "anonymize";
   const showAnonymizeFileName = task === "anonymize";
   const showRedactionConfig = task === "redact";
+  const showExportOptions = task === "export";
+  const showSpeakerMap = task === "export" && exportOption === "notion";
+
+  const mediaFile = isMediaFile(file);
+  const isValidFileForConfig =
+    (mediaFile && task !== "export") || (!mediaFile && task === "export");
 
   const disableButton =
     // Disable during processing
     processingState === "processing" ||
     // Disable if there is no file
     !file ||
+    // Disable if the file that was dropped is not valid for the current config
+    !isValidFileForConfig ||
     // Disable if there is no task
     task === "" ||
     // Disable if there is no reduaction config and task is redact
     (!redactionConfigFile.length && task === "redact") ||
     // Disable if the user tries to use the 'nova' model with a language other than 'en'
-    (language !== "en" && model === "nova");
+    (language !== "en" && model === "nova") ||
+    // Disable if there is no spea
+    (task === "export" &&
+      exportOption === "notion" &&
+      !isValidSpeakerMap(speakerMap));
 
-  const onConfigChange = (key: keyof TransformationConfig, value: string) => {
+  const onConfigChange = (key: keyof TransformationConfig, value: unknown) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -93,7 +113,21 @@ export const Sidebar = ({
         <div className="flex flex-col gap-2 px-4">
           <Select
             label="Task"
-            options={TASKS}
+            options={TASKS.map((t) => {
+              if (t.value === "") {
+                return t;
+              }
+              if (!file) {
+                return t;
+              }
+              if (t.value === "export" && mediaFile) {
+                return { ...t, disabled: true };
+              }
+              if (t.value !== "export" && !mediaFile) {
+                return { ...t, disabled: true };
+              }
+              return t;
+            })}
             value={task}
             onChange={({ target }) => onConfigChange("task", target.value)}
           />
@@ -185,6 +219,29 @@ export const Sidebar = ({
                     Edit Redaction Config
                   </button>
                 </div>
+              )}
+              {showExportOptions && (
+                <Select
+                  label="Export Options"
+                  options={EXPORTS}
+                  value={exportOption}
+                  onChange={({ target }) =>
+                    onConfigChange("exportOption", target.value)
+                  }
+                />
+              )}
+              {showSpeakerMap && (
+                <Input
+                  label="Map Speakers"
+                  type="text"
+                  optional
+                  placeholder="Enter a configuration"
+                  tooltip="Enter the names of the speakers. It should follow the format '0:john, 1:mary'."
+                  value={speakerMap}
+                  onChange={({ target }) =>
+                    onConfigChange("speakerMap", target.value)
+                  }
+                />
               )}
             </div>
           </div>

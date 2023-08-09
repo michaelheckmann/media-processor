@@ -13,6 +13,9 @@ import { rendererConfig } from "./webpack.renderer.config";
 
 const config: ForgeConfig = {
   packagerConfig: {
+    name: "Media Processor",
+    appCategoryType: "public.app-category.productivity",
+    icon: path.resolve(__dirname, "assets", "icons", "mac", "icon"),
     asar: true,
   },
   rebuildConfig: {},
@@ -74,7 +77,7 @@ const config: ForgeConfig = {
     }),
     new FFmpegStatic({
       remove: true, // Required
-      path: path.join(__dirname, ".webpack", "main"), // Set path of main build
+      path: path.join(__dirname, ".webpack", "main"), // Set path of main build,
     }),
   ],
 };

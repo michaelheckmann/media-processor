@@ -27,7 +27,8 @@ export const Dropzone = ({
   const onDrop = (acceptedFiles: File[]) => {
     setIsValid(undefined);
     const selectedFile = selectFile(acceptedFiles);
-    if (selectFile) {
+
+    if (selectedFile) {
       handleDrop(selectedFile);
       setFileDropped(true);
     } else {

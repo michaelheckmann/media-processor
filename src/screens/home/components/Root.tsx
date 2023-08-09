@@ -17,6 +17,8 @@ export const Root = () => {
     anonymizationStrength: "medium",
     anonymizeFileName: "",
     redactionConfigFile: "",
+    exportOption: "notion",
+    speakerMap: "",
   });
 
   const [processingState, setProcessingState] =
