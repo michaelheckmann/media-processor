@@ -13,11 +13,12 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-type Window = "main" | "settings" | "editor" | "redactionConfig";
+type Window = "main" | "settings" | "editor" | "ner" | "redactionConfig";
 export const windows: Record<Window, BrowserWindow | null> = {
   main: null,
   settings: null,
   editor: null,
+  ner: null,
   redactionConfig: null,
 };
 

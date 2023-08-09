@@ -1,4 +1,4 @@
-import { LoadingBar } from "./LoadingBar";
+import { LoadingBar } from "../../../components/LoadingBar";
 import { ProcessingState } from "./Root";
 import { TransformationConfig } from "./Sidebar";
 

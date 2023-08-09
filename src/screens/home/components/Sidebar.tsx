@@ -83,6 +83,10 @@ export const Sidebar = ({
     window.electronAPI.openRedactionConfig(redactionConfigFile);
   };
 
+  const onOpenNER = () => {
+    window.electronAPI.openNER();
+  };
+
   return (
     <div className="flex flex-col w-48 gap-4 py-4 bg-stone-900/80 border-r-1 border-stone-700">
       <div className="pb-5 border-dashed border-b-1 border-stone-700">
@@ -175,9 +179,12 @@ export const Sidebar = ({
                 />
               )}
               {showRedactionConfig && (
-                <button onClick={onOpenRedactionConfig}>
-                  Edit Redaction Config
-                </button>
+                <div className="flex flex-col gap-6">
+                  <button onClick={onOpenNER}>Run NER Script</button>
+                  <button onClick={onOpenRedactionConfig}>
+                    Edit Redaction Config
+                  </button>
+                </div>
               )}
             </div>
           </div>

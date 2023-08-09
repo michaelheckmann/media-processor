@@ -19,6 +19,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openEditor: () => {
     return ipcRenderer.invoke("open-editor");
   },
+  openNER: () => {
+    return ipcRenderer.invoke("open-ner");
+  },
   openRedactionConfig: (filePath: string) => {
     return ipcRenderer.invoke("open-redaction-config", filePath);
   },

@@ -13,6 +13,7 @@ declare global {
       ) => void;
       openSettings: () => void;
       openEditor: () => void;
+      openNER: () => void;
       openRedactionConfig: (filePath: string) => void;
       store: {
         get: (key: ElectronStoreKey) => Promise<string>;
@@ -27,6 +28,7 @@ declare global {
       handleRedactionConfigSaved: (
         callback: (event: Electron.IpcRendererEvent, filePath: string) => void
       ) => void;
+      runNER: (scriptFilePath: string, txtFilePath: string) => Promise<boolean>;
     };
   }
 }

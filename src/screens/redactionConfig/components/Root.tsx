@@ -1,26 +1,11 @@
 import { useRef, useState } from "react";
 
 import { Dropzone } from "@/components/Dropzone";
+import { TextEditor } from "@/screens/editor/components/TextEditor";
 import { loader } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
-import { TextEditor } from "./TextEditor";
 
 loader.config({ monaco });
-
-const validator = (file: File) => {
-  if (
-    !file.path?.endsWith("transcript.txt") &&
-    !file.path?.endsWith("redaction-config.txt")
-  ) {
-    return {
-      code: "wrong-file",
-      message:
-        "Please select a transcript or redaction config file to get started.",
-    };
-  }
-
-  return null;
-};
 
 export const Root = () => {
   const [transcript, setTranscript] = useState("");
@@ -47,6 +32,28 @@ export const Root = () => {
     return false;
   };
 
+  const selectFile = (files: File[]) => {
+    const transcriptFile = files.find((f) => f.path.endsWith("transcript.txt"));
+    const redactionFile = files.find((f) =>
+      f.path.endsWith("redaction-config.txt")
+    );
+    const jsonFile = files.find((f) => f.path.endsWith("transcript.json"));
+    const dovetailFile = files.find((f) => f.path.endsWith("dovetail.vtt"));
+
+    if (!jsonFile || !dovetailFile) {
+      return undefined;
+    }
+
+    if (redactionFile) {
+      return redactionFile;
+    }
+    if (transcriptFile) {
+      return transcriptFile;
+    }
+
+    return undefined;
+  };
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2 drag-header">
@@ -54,16 +61,11 @@ export const Root = () => {
       </div>
       <main className="flex flex-col items-center justify-center flex-1 overflow-hidden">
         <Dropzone
-          {...{ handleDrop }}
-          dragInactiveText="Drag 'n' drop a redaction-config.txt"
+          {...{ handleDrop, selectFile }}
+          directory
+          dragInactiveText="Drag 'n' drop a transcription folder"
           dropZoneProps={{
-            accept: {
-              "text/plain": [".txt"],
-            },
-            multiple: false,
-            maxFiles: 1,
             noClick: true,
-            validator,
           }}
         >
           <TextEditor initialValue={transcript} onSave={handleSave} />

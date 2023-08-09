@@ -85,7 +85,7 @@ export const TextEditor = ({
       )}
       <ErrorBoundary fallback={<div>Something went wrong</div>}>
         {isDirty && (
-          <div className="absolute z-10 px-2 py-[2px] text-[10px] font-semibold font-mono text-red-50 bg-red-900 rounded-[0.4rem] top-[9px] right-[9px]">
+          <div className="absolute z-10 px-3 py-[2px] text-[10px] font-medium tracking-[0.2px] text-[#ff2316] bg-[#5d00007d] rounded-[0.4rem] top-[9px] right-[9px]">
             Unsaved changes
           </div>
         )}
