@@ -50,9 +50,19 @@ const anonymizeVideo = (pathIn: string, config: TransformationConfig) => {
   };
   const anonymization = anonymizationMap[config.anonymizationStrength];
 
-  return anonymizeAudio(pathIn, config)
-    .videoFilter(`boxblur=${anonymization}`)
-    .outputOptions(["-vcodec libx264", "-preset ultrafast"]);
+  const [_, __, x, y] = config.blurArea.split(":");
+
+  const blurCommand = config.blurArea
+    ? anonymizeAudio(pathIn, config)
+        .complexFilter(
+          `[0:v]crop=${config.blurArea},avgblur=${
+            anonymization * 2
+          }[fg];[0:v][fg]overlay=${x}:${y}[v]`
+        )
+        .outputOptions(["-map [v]", "-map 0:a"])
+    : anonymizeAudio(pathIn, config).videoFilter(`boxblur=${anonymization}`);
+
+  return blurCommand.outputOptions(["-vcodec libx265", "-preset ultrafast"]);
 };
 
 /**

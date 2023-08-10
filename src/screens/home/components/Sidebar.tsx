@@ -2,6 +2,7 @@ import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
 import { isMediaFile } from "@/utils/isMediaFile";
 import { Dispatch, SetStateAction } from "react";
+import { isValidBlurArea } from "../utils/isValidBlurArea";
 import {
   ANONYMIZATIONS,
   AnonymizationStrengthOption,
@@ -25,6 +26,7 @@ export type TransformationConfig = {
   model: ModelOption;
   anonymizationStrength: AnonymizationStrengthOption;
   anonymizeFileName: string;
+  blurArea: string;
   redactionConfigFile: string;
   exportOption: ExportOption;
   speakerMap: string;
@@ -56,6 +58,7 @@ export const Sidebar = ({
     redactionConfigFile,
     exportOption,
     speakerMap,
+    blurArea,
   } = config;
 
   const showOptions = task !== "";
@@ -65,6 +68,7 @@ export const Sidebar = ({
   const showModel = task === "transcribe";
   const showAnonymizationStrength = task === "anonymize";
   const showAnonymizeFileName = task === "anonymize";
+  const showBlurArea = task === "anonymize";
   const showRedactionConfig = task === "redact";
   const showExportOptions = task === "export";
   const showSpeakerMap = task === "export" && exportOption === "notion";
@@ -86,10 +90,12 @@ export const Sidebar = ({
     (!redactionConfigFile.length && task === "redact") ||
     // Disable if the user tries to use the 'nova' model with a language other than 'en'
     (language !== "en" && model === "nova") ||
-    // Disable if there is no spea
+    // Disable if the user tries to export to notion but the speaker map is invalid
     (task === "export" &&
       exportOption === "notion" &&
-      !isValidSpeakerMap(speakerMap));
+      !isValidSpeakerMap(speakerMap)) ||
+    // Disable if the user tries to export to notion but the speaker map is invalid
+    (task === "anonymize" && blurArea !== "" && !isValidBlurArea(blurArea));
 
   const onConfigChange = (key: keyof TransformationConfig, value: unknown) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
@@ -196,6 +202,19 @@ export const Sidebar = ({
                   value={anonymizationStrength}
                   onChange={({ target }) =>
                     onConfigChange("anonymizationStrength", target.value)
+                  }
+                />
+              )}
+              {showBlurArea && (
+                <Input
+                  label="Blur area"
+                  type="text"
+                  optional
+                  placeholder="Enter a text"
+                  tooltip="Enter the configuration of the area you want to blur. The format is 'w:h:x:y' where x and y are the coordinates of the top left corner of the area, w is the width and h is the height. For example, '400:220:760:0' will blur the area starting at x=760 and y=0, with a width of 400 and a height of 220."
+                  value={blurArea}
+                  onChange={({ target }) =>
+                    onConfigChange("blurArea", target.value)
                   }
                 />
               )}

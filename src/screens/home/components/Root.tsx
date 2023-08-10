@@ -16,6 +16,7 @@ export const Root = () => {
     model: "whisper-large",
     anonymizationStrength: "medium",
     anonymizeFileName: "",
+    blurArea: "",
     redactionConfigFile: "",
     exportOption: "notion",
     speakerMap: "",

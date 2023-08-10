@@ -17,7 +17,7 @@ export const TASKS: SideBarOptions<TaskOption> = [
     value: "",
   },
   {
-    label: "Video compression",
+    label: "Compression",
     value: "compress",
   },
   {
@@ -91,6 +91,5 @@ export const EXPORTS: SideBarOptions<ExportOption> = [
   {
     label: "AWS S3",
     value: "s3",
-    disabled: true,
   },
 ];

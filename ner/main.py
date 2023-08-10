@@ -36,8 +36,8 @@ def main(argv):
     # run NER over the sentences
     tagger.predict(sentences)
 
-    # Create a new output file, next to the input file, with the " [ner]" suffix
-    output_file_path = input_file_path.replace(".txt", " [ner].txt")
+    # Create a new output file, next to the input file with the name "ner-analysis.txt"
+    output_file_path = os.path.join(os.path.dirname(input_file_path), "ner-analysis.txt")
 
     # if the file already exists, delete it
     try:

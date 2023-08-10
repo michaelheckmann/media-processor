@@ -64,7 +64,26 @@ export const exportTransformation = async (
     exportToNotion(projectFolderPath, config.speakerMap);
     copyFileSync(
       `${projectFolderPath}/${lastModifiedMediaFile.name}`,
-      `${projectFolderPath}/export/${lastModifiedMediaFile.name}`
+      `${outFolderPath}/${lastModifiedMediaFile.name}`
+    );
+  }
+
+  if (config.exportOption === "s3") {
+    const s3ExportFolderPath = `${outFolderPath}/${lastModifiedMediaFile.name.replace(
+      /\s\[.*?\]/g,
+      ""
+    )}`;
+    if (!existsSync(s3ExportFolderPath)) {
+      mkdirSync(s3ExportFolderPath);
+    }
+
+    copyFileSync(
+      `${projectFolderPath}/${lastModifiedMediaFile.name}`,
+      `${s3ExportFolderPath}/${lastModifiedMediaFile.name}`
+    );
+    copyFileSync(
+      `${projectFolderPath}/transcription/dovetail.vtt`,
+      `${s3ExportFolderPath}/dovetail.vtt`
     );
   }
   spawnSync("open", [outFolderPath]);

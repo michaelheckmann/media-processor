@@ -9,7 +9,7 @@ export const Header = () => {
 
   return (
     <div className="w-full flex items-center pl-24 pr-4 font-bold border-b-1 h-[3.2rem] border-stone-700 bg-stone-900/80 gap-2">
-      <div className="flex-1 drag-header">
+      <div className="flex-1 select-none drag-header">
         <div>Media Processor</div>
       </div>
       <div className="flex gap-2">

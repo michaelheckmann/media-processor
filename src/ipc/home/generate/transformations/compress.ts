@@ -49,7 +49,7 @@ const compressVideo = (pathIn: string, config: TransformationConfig) => {
 
   return ffmpeg(pathIn)
     .videoFilter(`scale=trunc(iw/${compression})*2:trunc(ih/${compression})*2`)
-    .outputOptions(["-vcodec libx264", "-preset ultrafast"]);
+    .outputOptions(["-vcodec libx265", "-preset ultrafast"]);
 };
 
 /**
