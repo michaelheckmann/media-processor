@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getPseudonym } from "./getPseudonym";
 
 /**
  * The function `getStrippedFileName` takes a file path as input and returns the file name without the
@@ -13,9 +14,21 @@ const getStrippedFileName = (filePath: string) => {
   return fileName.replace(fileExtension, "").trim();
 };
 
+/**
+ * The `anonymizeFileName` function takes a file path and an optional anonymization string, and returns
+ * a new file path with the anonymization string replaced by a pseudonym.
+ * @param {string} filePath - A string representing the file path of the file that needs to be
+ * anonymized.
+ * @param {string} [anonymization] - The `anonymization` parameter is a string that represents the part
+ * of the file name that needs to be anonymized.
+ * @returns The function `anonymizeFileName` returns the `filePath` with the `anonymization` replaced
+ * by its corresponding `pseudonym`. If no `anonymization` is provided, it returns the original
+ * `filePath`.
+ */
 const anonymizeFileName = (filePath: string, anonymization?: string) => {
   if (!anonymization) return filePath;
-  return filePath.replace(anonymization, "XXX");
+  const pseudonym = getPseudonym(anonymization);
+  return filePath.replace(anonymization, pseudonym);
 };
 
 /**

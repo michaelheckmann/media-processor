@@ -1,11 +1,9 @@
 import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
-import { isMediaFile } from "@/utils/isMediaFile";
+import { isMediaFile, isVideoFile } from "@/utils/isMediaFile";
 import { Dispatch, SetStateAction } from "react";
 import { isValidBlurArea } from "../utils/isValidBlurArea";
 import {
-  ANONYMIZATIONS,
-  AnonymizationStrengthOption,
   COMPRESSIONS,
   CompressionOption,
   EXPORTS,
@@ -24,7 +22,8 @@ export type TransformationConfig = {
   language: string;
   compression: CompressionOption;
   model: ModelOption;
-  anonymizationStrength: AnonymizationStrengthOption;
+  anonymizationStrengthVideo: string;
+  anonymizationStrengthAudio: string;
   anonymizeFileName: string;
   blurArea: string;
   redactionConfigFile: string;
@@ -53,7 +52,8 @@ export const Sidebar = ({
     language,
     compression,
     model,
-    anonymizationStrength,
+    anonymizationStrengthVideo,
+    anonymizationStrengthAudio,
     anonymizeFileName,
     redactionConfigFile,
     exportOption,
@@ -66,9 +66,11 @@ export const Sidebar = ({
   const showLanguage = task === "transcribe";
   const showCompression = task === "compress";
   const showModel = task === "transcribe";
-  const showAnonymizationStrength = task === "anonymize";
+  const showAnonymizationStrengthVideo =
+    task === "anonymize" && isVideoFile(file);
+  const showAnonymizationStrengthAudio = task === "anonymize";
   const showAnonymizeFileName = task === "anonymize";
-  const showBlurArea = task === "anonymize";
+  const showBlurArea = task === "anonymize" && isVideoFile(file);
   const showRedactionConfig = task === "redact";
   const showExportOptions = task === "export";
   const showSpeakerMap = task === "export" && exportOption === "notion";
@@ -195,13 +197,16 @@ export const Sidebar = ({
                   }
                 />
               )}
-              {showAnonymizationStrength && (
-                <Select
-                  label="Anonymization Strength"
-                  options={ANONYMIZATIONS}
-                  value={anonymizationStrength}
+              {showAnonymizationStrengthVideo && (
+                <Input
+                  label="Blur Strength"
+                  type="number"
+                  placeholder="Enter a number"
+                  min={0}
+                  value={anonymizationStrengthVideo}
+                  tooltip="We recommend a value between 0 and 10. The higher the value, the stronger the blur."
                   onChange={({ target }) =>
-                    onConfigChange("anonymizationStrength", target.value)
+                    onConfigChange("anonymizationStrengthVideo", target.value)
                   }
                 />
               )}
@@ -215,6 +220,19 @@ export const Sidebar = ({
                   value={blurArea}
                   onChange={({ target }) =>
                     onConfigChange("blurArea", target.value)
+                  }
+                />
+              )}
+              {showAnonymizationStrengthAudio && (
+                <Input
+                  label="Pitch Shift Strength"
+                  type="number"
+                  placeholder="Enter a number"
+                  min={0}
+                  value={anonymizationStrengthAudio}
+                  tooltip="We recommend a value between 0 and 4. The higher the value, the stronger the pitch shift."
+                  onChange={({ target }) =>
+                    onConfigChange("anonymizationStrengthAudio", target.value)
                   }
                 />
               )}

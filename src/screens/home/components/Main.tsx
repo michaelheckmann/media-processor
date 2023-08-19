@@ -22,14 +22,14 @@ const exportDropzoneConfig: DropzoneConfig = {
     });
 
     // Every file needs to be in a project folder
-    const isInProjectFolder = files.every((f) => {
+    const isInProjectDir = files.every((f) => {
       return f.path.includes("[processed]");
     });
 
     // It is important that we're returning the .json file, because
     // the .json ending is used to infer that we want to operate on a
     // project folder, not a media file
-    return transcriptFile && mediaFile && isInProjectFolder
+    return transcriptFile && mediaFile && isInProjectDir
       ? transcriptFile
       : undefined;
   },
@@ -74,11 +74,11 @@ const generalDropzoneConfig: DropzoneConfig = {
     const mediaFile = files.find((f) => {
       return isMediaFile(f);
     });
-    const isInProjectFolder = files.every((f) => {
+    const isInProjectDir = files.every((f) => {
       return f.path.includes("[processed]");
     });
 
-    return transcriptFile && mediaFile && isInProjectFolder
+    return transcriptFile && mediaFile && isInProjectDir
       ? transcriptFile
       : undefined;
   },

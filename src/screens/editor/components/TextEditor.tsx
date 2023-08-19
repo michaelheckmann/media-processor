@@ -21,6 +21,31 @@ monaco.languages.setMonarchTokensProvider("vtt", {
     ],
   },
 });
+monaco.languages.setLanguageConfiguration("vtt", {
+  brackets: [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+  ],
+  autoClosingPairs: [
+    { open: "{", close: "}" },
+    { open: "[", close: "]" },
+    { open: "(", close: ")" },
+    { open: "<", close: ">", notIn: ["string"] },
+  ],
+  surroundingPairs: [
+    { open: "(", close: ")" },
+    { open: "[", close: "]" },
+    { open: "`", close: "`" },
+  ],
+  folding: {
+    markers: {
+      start: new RegExp("^\\s*<!--\\s*#?region\\b.*-->"),
+      end: new RegExp("^\\s*<!--\\s*#?endregion\\b.*-->"),
+    },
+  },
+  colorizedBracketPairs: [],
+});
 monaco.editor.defineTheme("media-processor", {
   base: "vs-dark",
   inherit: true,
@@ -46,7 +71,7 @@ type Props = {
 export const TextEditor = ({
   initialValue,
   onSave,
-  defaultLanguage = "vtt",
+  defaultLanguage,
 }: Props) => {
   const [mounted, setMounted] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -85,7 +110,7 @@ export const TextEditor = ({
       )}
       <ErrorBoundary fallback={<div>Something went wrong</div>}>
         {isDirty && (
-          <div className="absolute z-10 px-3 py-[2px] text-[10px] font-medium tracking-[0.2px] text-[#ff2316] bg-[#5d00007d] rounded-[0.4rem] top-[9px] right-[9px]">
+          <div className="absolute z-10 px-3 py-[2px] text-[10px] font-medium tracking-[0.2px] text-[#ff2316] bg-[#5d00007d] rounded-[0.4rem] top-[9px] right-[9px] select-none">
             Unsaved changes
           </div>
         )}
@@ -98,6 +123,10 @@ export const TextEditor = ({
             fontFamily: "monospace",
             contextmenu: false,
             wordWrap: "on",
+            autoClosingBrackets: "always",
+            bracketPairColorization: {
+              enabled: false,
+            },
           }}
           className={clsx("transition-opacity duration-700", {
             "opacity-0": !mounted,

@@ -56,8 +56,12 @@ export const Root = () => {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2 drag-header">
-        Redaction Configuration
+      <div className="w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2">
+        <div className="flex-1 select-none drag-header">
+          <div className="flex items-center justify-center w-full">
+            Redaction Configuration
+          </div>
+        </div>
       </div>
       <main className="flex flex-col items-center justify-center flex-1 overflow-hidden">
         <Dropzone
@@ -68,7 +72,11 @@ export const Root = () => {
             noClick: true,
           }}
         >
-          <TextEditor initialValue={transcript} onSave={handleSave} />
+          <TextEditor
+            initialValue={transcript}
+            onSave={handleSave}
+            defaultLanguage="vtt"
+          />
         </Dropzone>
       </main>
     </div>

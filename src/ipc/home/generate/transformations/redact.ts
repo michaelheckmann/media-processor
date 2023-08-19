@@ -315,5 +315,10 @@ export const redactTransformation = async (
     getOutFilePath(transcriptFileName, "redacted"),
     redactedTranscript
   );
-  spawnSync("open", [pathOut]);
+  try {
+    // Open the file in the IINA app
+    spawnSync("open", ["-a", "IINA", pathOut]);
+  } catch (error) {
+    console.log("Error opening file in IINA");
+  }
 };

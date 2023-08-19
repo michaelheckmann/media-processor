@@ -35,8 +35,8 @@ export const Root = () => {
   return (
     <div className="flex flex-col w-full h-full">
       <div className="w-full flex items-center pl-24 pr-4 text-sm font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2">
-        <div className="flex items-center justify-center flex-1 drag-header">
-          <div>NER</div>
+        <div className="flex-1 select-none drag-header">
+          <div className="flex items-center justify-center w-full">NER</div>
         </div>
         <div>
           <button

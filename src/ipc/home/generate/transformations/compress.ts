@@ -112,5 +112,10 @@ export const compressTransformation = async (
 ) => {
   const pathOut = getOutFilePath(pathIn, "compressed");
   await compressFile(pathIn, pathOut, config);
-  spawnSync("open", [pathOut]);
+  try {
+    // Open the file in the IINA app
+    spawnSync("open", ["-a", "IINA", pathOut]);
+  } catch (error) {
+    console.log("Error opening file in IINA");
+  }
 };

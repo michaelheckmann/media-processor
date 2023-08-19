@@ -37,6 +37,10 @@ body {
 
 .drag-header {
   -webkit-app-region: drag;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
 }
 
 select,

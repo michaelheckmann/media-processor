@@ -43,48 +43,48 @@ export const exportTransformation = async (
   const projectPartIndex = pathParts.findIndex((part) =>
     part.endsWith("[processed]")
   );
-  const projectFolderPath = pathParts.slice(0, projectPartIndex + 1).join("/");
-  const outFolderPath = `${projectFolderPath}/export`;
+  const projectDirPath = pathParts.slice(0, projectPartIndex + 1).join("/");
+  const outDirPath = `${projectDirPath}/export`;
 
-  if (!existsSync(outFolderPath)) {
-    mkdirSync(outFolderPath);
+  if (!existsSync(outDirPath)) {
+    mkdirSync(outDirPath);
   }
 
   //   Get all files in the project folder and sort by last modified
-  const files = readdirSync(projectFolderPath)
+  const files = readdirSync(projectDirPath)
     .map((name) => ({
       name,
-      time: statSync(`${projectFolderPath}/${name}`).mtime.getTime(),
+      time: statSync(`${projectDirPath}/${name}`).mtime.getTime(),
     }))
     .sort((a, b) => b.time - a.time);
 
   const lastModifiedMediaFile = files.find((file) => isMediaFile(file.name));
 
   if (config.exportOption === "notion") {
-    exportToNotion(projectFolderPath, config.speakerMap);
+    exportToNotion(projectDirPath, config.speakerMap);
     copyFileSync(
-      `${projectFolderPath}/${lastModifiedMediaFile.name}`,
-      `${outFolderPath}/${lastModifiedMediaFile.name}`
+      `${projectDirPath}/${lastModifiedMediaFile.name}`,
+      `${outDirPath}/${lastModifiedMediaFile.name}`
     );
   }
 
   if (config.exportOption === "s3") {
-    const s3ExportFolderPath = `${outFolderPath}/${lastModifiedMediaFile.name.replace(
+    const s3ExportDirPath = `${outDirPath}/${lastModifiedMediaFile.name.replace(
       /\s\[.*?\]/g,
       ""
     )}`;
-    if (!existsSync(s3ExportFolderPath)) {
-      mkdirSync(s3ExportFolderPath);
+    if (!existsSync(s3ExportDirPath)) {
+      mkdirSync(s3ExportDirPath);
     }
 
     copyFileSync(
-      `${projectFolderPath}/${lastModifiedMediaFile.name}`,
-      `${s3ExportFolderPath}/${lastModifiedMediaFile.name}`
+      `${projectDirPath}/${lastModifiedMediaFile.name}`,
+      `${s3ExportDirPath}/${lastModifiedMediaFile.name}`
     );
     copyFileSync(
-      `${projectFolderPath}/transcription/dovetail.vtt`,
-      `${s3ExportFolderPath}/dovetail.vtt`
+      `${projectDirPath}/transcription/dovetail.vtt`,
+      `${s3ExportDirPath}/dovetail.vtt`
     );
   }
-  spawnSync("open", [outFolderPath]);
+  spawnSync("open", [outDirPath]);
 };

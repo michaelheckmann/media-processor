@@ -5,17 +5,17 @@ import { dirname, join } from "path";
 /**
  * Creates or activates a Python virtual environment in the specified folder path
  * and installs the specified dependency if it's not already installed.
- * @param folderPath The path to the folder where the virtual environment should be created or activated
+ * @param dirPath The path to the folder where the virtual environment should be created or activated
  * @param dependency The name of the dependency to install (default: "flair")
  */
 export const createOrActivateVirtualEnv = async (
-  folderPath: string,
+  dirPath: string,
   dependency = "flair"
 ) => {
   // Check if the virtual environment already exists
-  const venvFolderPath = join(folderPath, "venv");
+  const venvDirPath = join(dirPath, "venv");
   const venvExists = await new Promise<boolean>((resolve, reject) => {
-    const process = spawn("test", ["-d", venvFolderPath], {
+    const process = spawn("test", ["-d", venvDirPath], {
       stdio: "inherit",
       shell: true,
     });
@@ -32,7 +32,7 @@ export const createOrActivateVirtualEnv = async (
 
   // Create the virtual environment if it doesn't exist
   if (!venvExists) {
-    const process = spawn("python3", ["-m", "venv", venvFolderPath], {
+    const process = spawn("python3", ["-m", "venv", venvDirPath], {
       stdio: "inherit",
       shell: true,
     });
@@ -49,14 +49,14 @@ export const createOrActivateVirtualEnv = async (
   }
 
   // Activate the virtual environment and check if the dependency is already installed
-  const activateScriptPath = join(venvFolderPath, "bin", "activate");
+  const activateScriptPath = join(venvDirPath, "bin", "activate");
   const activateCommand = `source ${activateScriptPath}`;
   const checkCommand = `pip show ${dependency}`;
 
   const checkProcess = spawn(`${activateCommand} && ${checkCommand}`, {
     stdio: "inherit",
     shell: true,
-    cwd: folderPath,
+    cwd: dirPath,
   });
 
   const dependencyInstalled = await new Promise<boolean>((resolve, reject) => {
@@ -80,7 +80,7 @@ export const createOrActivateVirtualEnv = async (
     const process = spawn(`${activateCommand} && ${installCommand}`, {
       stdio: "inherit",
       shell: true,
-      cwd: folderPath,
+      cwd: dirPath,
     });
 
     await new Promise<void>((resolve, reject) => {
@@ -102,12 +102,12 @@ export const runNER = async (
   model?: string
 ) => {
   const safeTXTFilePath = txtFilePath.replace(/(\s+)/g, "\\$1");
-  const scriptFolderPath = dirname(scriptFilePath);
+  const scriptDirPath = dirname(scriptFilePath);
 
-  await createOrActivateVirtualEnv(scriptFolderPath);
+  await createOrActivateVirtualEnv(scriptDirPath);
 
-  const pythonPath = join(scriptFolderPath, "venv", "bin", "python3");
-  const scriptPath = join(scriptFolderPath, "main.py");
+  const pythonPath = join(scriptDirPath, "venv", "bin", "python3");
+  const scriptPath = join(scriptDirPath, "main.py");
   const modelFlag = `--model=${model ?? "de-ner-large"}`;
 
   const process = spawn(pythonPath, [scriptPath, modelFlag, safeTXTFilePath], {

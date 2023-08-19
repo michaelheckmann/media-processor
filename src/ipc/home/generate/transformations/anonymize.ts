@@ -6,26 +6,18 @@ import { onEnd, onError, onProgress } from "../utils/ffmpegOptions";
 import { getOutFilePath } from "../utils/getOutPaths";
 
 /**
- * The `anonymizeAudio` function takes in a file path and a configuration object, and returns an FFmpeg
- * command that applies audio filters to anonymize the audio based on the specified strength in the
- * configuration.
+ * The `anonymizeAudio` function takes in a file path and a configuration object, and returns an ffmpeg
+ * command that applies audio filters to anonymize the audio.
  * @param {string} pathIn - The `pathIn` parameter is a string that represents the path to the input
- * audio file that needs to be anonymized.
+ * audio file that you want to anonymize.
  * @param {TransformationConfig} config - The `config` parameter is an object that contains the
- * configuration for the audio transformation. It has a property called `anonymizationStrength` which
- * represents the level of anonymization to be applied to the audio. The possible values for
- * `anonymizationStrength` are "low", "medium", and
- * @returns a modified ffmpeg command that applies audio filters to the input audio file. The audio
- * filters include changing the sample rate and adjusting the tempo based on the specified
- * anonymization strength in the config object.
+ * configuration for the audio transformation. It likely includes properties such as
+ * `anonymizationStrengthAudio`, which is a numerical value representing the strength of the
+ * anonymization process.
+ * @returns a modified ffmpeg command that applies audio filters for anonymization.
  */
 const anonymizeAudio = (pathIn: string, config: TransformationConfig) => {
-  const anonymizationMap = {
-    low: 7.5,
-    medium: 7,
-    high: 6.5,
-  };
-  const anonymization = anonymizationMap[config.anonymizationStrength];
+  const anonymization = 10 - parseFloat(config.anonymizationStrengthAudio);
   return ffmpeg(pathIn).audioFilters([
     `asetrate=48000*${anonymization / 10}`,
     `atempo=${10 / anonymization}`,
@@ -38,26 +30,19 @@ const anonymizeAudio = (pathIn: string, config: TransformationConfig) => {
  * @param {string} pathIn - The `pathIn` parameter is a string that represents the path or location of
  * the input video file that needs to be anonymized.
  * @param {TransformationConfig} config - The `config` parameter is an object that contains the
- * configuration for the video anonymization. It has the following properties:
+ * configuration for the video anonymization.
  * @returns an instance of the `anonymizeAudio` function with some video filters and output options
  * applied.
  */
 const anonymizeVideo = (pathIn: string, config: TransformationConfig) => {
-  const anonymizationMap = {
-    low: 2,
-    medium: 6,
-    high: 10,
-  };
-  const anonymization = anonymizationMap[config.anonymizationStrength];
-
   const [_, __, x, y] = config.blurArea.split(":");
+
+  const anonymization = parseFloat(config.anonymizationStrengthVideo);
 
   const blurCommand = config.blurArea
     ? anonymizeAudio(pathIn, config)
         .complexFilter(
-          `[0:v]crop=${config.blurArea},avgblur=${
-            anonymization * 2
-          }[fg];[0:v][fg]overlay=${x}:${y}[v]`
+          `[0:v]crop=${config.blurArea},avgblur=${anonymization}[fg];[0:v][fg]overlay=${x}:${y}[v]`
         )
         .outputOptions(["-map [v]", "-map 0:a"])
     : anonymizeAudio(pathIn, config).videoFilter(`boxblur=${anonymization}`);
@@ -129,5 +114,10 @@ export const anonymizeTransformation = async (
     config.anonymizeFileName
   );
   await anonymizeFile(pathIn, pathOut, config);
-  spawnSync("open", [pathOut]);
+  try {
+    // Open the file in the IINA app
+    spawnSync("open", ["-a", "IINA", pathOut]);
+  } catch (error) {
+    console.log("Error opening file in IINA");
+  }
 };

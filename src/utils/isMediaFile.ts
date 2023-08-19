@@ -128,3 +128,19 @@ export const isMediaFile = (file?: File | string): boolean => {
   );
   return !!mimeType;
 };
+
+export const isAudioFile = (file?: File | string): boolean => {
+  if (!file) return false;
+  const fileName = typeof file === "string" ? file : file.name;
+  const extension = fileName.split(".").pop();
+  if (!extension) return false;
+  return mimeTypes.audio.includes(extension);
+};
+
+export const isVideoFile = (file?: File | string): boolean => {
+  if (!file) return false;
+  const fileName = typeof file === "string" ? file : file.name;
+  const extension = fileName.split(".").pop();
+  if (!extension) return false;
+  return mimeTypes.video.includes(extension);
+};

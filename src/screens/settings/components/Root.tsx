@@ -19,8 +19,12 @@ export const Root = () => {
 
   return (
     <>
-      <div className="w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2 drag-header">
-        Settings
+      <div className=" z-10 sticky top-0 left-0 w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2">
+        <div className="flex-1 select-none drag-header">
+          <div className="flex items-center justify-center w-full">
+            Settings
+          </div>
+        </div>
       </div>
       <main className="flex flex-col flex-1 p-4">
         <div className="mb-2 font-medium uppercase opacity-30 text-2xs">

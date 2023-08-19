@@ -66,22 +66,6 @@ export const MODELS: SideBarOptions<ModelOption> = [
   },
 ];
 
-export type AnonymizationStrengthOption = "low" | "medium" | "high";
-export const ANONYMIZATIONS: SideBarOptions<AnonymizationStrengthOption> = [
-  {
-    label: "Low",
-    value: "low",
-  },
-  {
-    label: "Medium",
-    value: "medium",
-  },
-  {
-    label: "High",
-    value: "high",
-  },
-];
-
 export type ExportOption = "notion" | "s3";
 export const EXPORTS: SideBarOptions<ExportOption> = [
   {

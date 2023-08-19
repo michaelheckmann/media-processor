@@ -24,8 +24,10 @@ export const Root = () => {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 tracking-wide bg-stone-900/80 gap-2 drag-header">
-        Editor
+      <div className="z-10 sticky top-0 left-0 w-full flex items-center text-sm justify-center font-semibold text-stone-300 border-b-1 h-[2.4rem] border-stone-700 bg-stone-900/80 gap-2 flex-shrink-0 backdrop-blur-xl">
+        <div className="flex-1 select-none drag-header">
+          <div className="flex items-center justify-center w-full">Editor</div>
+        </div>
       </div>
       <main className="flex flex-col items-center justify-center flex-1 overflow-hidden">
         <Dropzone
@@ -37,11 +39,7 @@ export const Root = () => {
             noClick: true,
           }}
         >
-          <TextEditor
-            initialValue={fileContent}
-            onSave={handleSave}
-            defaultLanguage="markdown"
-          />
+          <TextEditor initialValue={fileContent} onSave={handleSave} />
         </Dropzone>
       </main>
     </div>
