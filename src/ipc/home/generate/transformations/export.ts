@@ -53,7 +53,7 @@ export const exportTransformation = async (
   //   Get all files in the project folder and sort by last modified
   const files = readdirSync(projectDirPath)
     .map((name) => ({
-      name,
+      name: name.split(".").slice(0, -1).join("."),
       time: statSync(`${projectDirPath}/${name}`).mtime.getTime(),
     }))
     .sort((a, b) => b.time - a.time);
@@ -81,9 +81,20 @@ export const exportTransformation = async (
       `${projectDirPath}/${lastModifiedMediaFile.name}`,
       `${s3ExportDirPath}/${lastModifiedMediaFile.name}`
     );
+
+    // Check if the right transcription file exists
+    let transcriptionFile = "dovetail [redacted].vtt";
+    if (!existsSync(`${projectDirPath}/transcription/${transcriptionFile}`)) {
+      transcriptionFile = "dovetail.vtt";
+
+      if (!existsSync(`${projectDirPath}/transcription/${transcriptionFile}`)) {
+        throw new Error("No transcription file found");
+      }
+    }
+
     copyFileSync(
-      `${projectDirPath}/transcription/dovetail.vtt`,
-      `${s3ExportDirPath}/dovetail.vtt`
+      `${projectDirPath}/transcription/${transcriptionFile}`,
+      `${s3ExportDirPath}/${transcriptionFile}`
     );
   }
   spawnSync("open", [outDirPath]);
