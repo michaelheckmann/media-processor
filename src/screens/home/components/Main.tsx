@@ -14,9 +14,7 @@ const exportDropzoneConfig: DropzoneConfig = {
   dragInactiveText: "Drag 'n' drop the processed media folder",
   selectFile: (files: File[]) => {
     // It should contain a file path that ends in transcript.json
-    const transcriptFile = files.find((f) =>
-      f.path.endsWith("transcript.json")
-    );
+    const transcriptFile = files.find((f) => f.path.endsWith("transcript.txt"));
     // It should contain at least 1 media file (audio or video)
     const mediaFile = files.find((f) => {
       return isMediaFile(f);

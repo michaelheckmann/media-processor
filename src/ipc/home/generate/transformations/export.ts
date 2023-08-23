@@ -52,19 +52,23 @@ export const exportTransformation = async (
 
   //   Get all files in the project folder and sort by last modified
   const files = readdirSync(projectDirPath)
-    .map((name) => ({
-      name: name.split(".").slice(0, -1).join("."),
-      time: statSync(`${projectDirPath}/${name}`).mtime.getTime(),
-    }))
+    .map((name) => {
+      const nameWithoutExtension = name.split(".").slice(0, -1).join(".");
+      return {
+        name: nameWithoutExtension,
+        path: name,
+        time: statSync(`${projectDirPath}/${name}`).mtime.getTime(),
+      };
+    })
     .sort((a, b) => b.time - a.time);
 
-  const lastModifiedMediaFile = files.find((file) => isMediaFile(file.name));
+  const lastModifiedMediaFile = files.find((file) => isMediaFile(file.path));
 
   if (config.exportOption === "notion") {
     exportToNotion(projectDirPath, config.speakerMap);
     copyFileSync(
-      `${projectDirPath}/${lastModifiedMediaFile.name}`,
-      `${outDirPath}/${lastModifiedMediaFile.name}`
+      `${projectDirPath}/${lastModifiedMediaFile.path}`,
+      `${outDirPath}/${lastModifiedMediaFile.path}`
     );
   }
 
@@ -78,8 +82,8 @@ export const exportTransformation = async (
     }
 
     copyFileSync(
-      `${projectDirPath}/${lastModifiedMediaFile.name}`,
-      `${s3ExportDirPath}/${lastModifiedMediaFile.name}`
+      `${projectDirPath}/${lastModifiedMediaFile.path}`,
+      `${s3ExportDirPath}/${lastModifiedMediaFile.path}`
     );
 
     // Check if the right transcription file exists

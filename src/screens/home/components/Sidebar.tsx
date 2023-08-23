@@ -67,7 +67,10 @@ export const Sidebar = ({
 
   const mediaFile = isMediaFile(file);
   const transcriptJSONFile = isTranscriptJSON(file);
+  console.log("transcriptJSONFile:", transcriptJSONFile);
+
   const projectFile = isProjectFile(file);
+  console.log("projectFile:", projectFile);
 
   const isValidFileForConfig = (t: TaskOption) =>
     (mediaFile && t !== "export") ||
