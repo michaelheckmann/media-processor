@@ -1,6 +1,8 @@
 import { ipcMainElectronStoreGet } from "@/ipc/shared/store";
 import { TransformationConfig } from "@/screens/home/components/Sidebar";
+import { isTranscriptJSON } from "@/utils/isTranscriptJSON";
 import { Deepgram } from "@deepgram/sdk";
+import { PrerecordedTranscriptionResponse } from "@deepgram/sdk/dist/types";
 import { spawnSync } from "child_process";
 import fs from "fs";
 import { lookup } from "mime-types";
@@ -38,12 +40,18 @@ export const transcribeFile = async (
     diarize: true,
     language: config.language,
     model: config.model,
+    callback: config.callbackUrl,
   });
 
   if (response.err_code) {
     throw new Error(response.err_msg);
   } else {
     console.log("Transcription complete");
+  }
+
+  if (config.callbackUrl) {
+    // Transcription Files are created async after the file has been generated
+    return;
   }
 
   createTranscriptionFiles(pathIn, response);
@@ -63,7 +71,16 @@ export const transcribeTransformation = async (
   pathIn: string,
   config: TransformationConfig
 ) => {
-  const outDir = getOutDirPath(pathIn, "transcription");
-  await transcribeFile(pathIn, config);
-  spawnSync("open", [outDir]);
+  // This is the case if a transcript was created async
+  // Any we just need to create the missing files
+  if (isTranscriptJSON(pathIn)) {
+    const data = fs.readFileSync(pathIn, "utf8");
+    const jsonData = JSON.parse(data);
+    const response = jsonData as PrerecordedTranscriptionResponse;
+    createTranscriptionFiles(pathIn, response);
+  } else {
+    const outDir = getOutDirPath(pathIn, "transcription");
+    await transcribeFile(pathIn, config);
+    spawnSync("open", [outDir]);
+  }
 };

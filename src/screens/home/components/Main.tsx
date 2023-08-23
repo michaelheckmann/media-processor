@@ -1,4 +1,5 @@
 import { isMediaFile } from "@/utils/isMediaFile";
+import { isTranscriptJSON } from "@/utils/isTranscriptJSON";
 import { ComponentProps } from "react";
 import { Dropzone } from "../../../components/Dropzone";
 import { FilePreview } from "./FilePreview";
@@ -55,6 +56,24 @@ const mediaDropzoneConfig: DropzoneConfig = {
   },
 };
 
+const transcriptionDropzoneConfig: DropzoneConfig = {
+  dragInactiveText: "Drag 'n' drop a media file or transcript.json file here",
+  dropZoneProps: {
+    multiple: false,
+    maxFiles: 1,
+    noClick: true,
+  },
+  selectFile: (files: File[]) => {
+    if (files.length === 1) {
+      if (isMediaFile(files[0]) || isTranscriptJSON(files[0])) {
+        return files[0];
+      }
+      return undefined;
+    }
+    return undefined;
+  },
+};
+
 const generalDropzoneConfig: DropzoneConfig = {
   dragInactiveText: "Drag 'n' drop a file here",
   dropZoneProps: {
@@ -62,15 +81,13 @@ const generalDropzoneConfig: DropzoneConfig = {
   },
   selectFile: (files: File[]) => {
     if (files.length === 1) {
-      if (isMediaFile(files[0])) {
+      if (isMediaFile(files[0]) || isTranscriptJSON(files[0])) {
         return files[0];
       }
       return undefined;
     }
 
-    const transcriptFile = files.find((f) =>
-      f.path.endsWith("transcript.json")
-    );
+    const transcriptFile = files.find((f) => f.path.endsWith("transcript.txt"));
     const mediaFile = files.find((f) => {
       return isMediaFile(f);
     });
@@ -97,6 +114,8 @@ export const Main = ({ file, config, handleDrop, processingState }: Props) => {
     dropZoneProps = generalDropzoneConfig;
   } else if (config.task === "export") {
     dropZoneProps = exportDropzoneConfig;
+  } else if (config.task === "transcribe") {
+    dropZoneProps = transcriptionDropzoneConfig;
   }
 
   return (

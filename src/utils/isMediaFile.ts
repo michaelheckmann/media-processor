@@ -1,3 +1,5 @@
+import { getFileProperty } from "./getFileProperty";
+
 const mimeTypes = {
   video: [
     "3gp",
@@ -119,8 +121,10 @@ const mimeTypes = {
 };
 
 export const isMediaFile = (file?: File | string): boolean => {
-  if (!file) return false;
-  const fileName = typeof file === "string" ? file : file.name;
+  const fileName = getFileProperty(file, "name");
+  if (!fileName) {
+    return false;
+  }
   const extension = fileName.split(".").pop();
   if (!extension) return false;
   const mimeType = Object.keys(mimeTypes).find((type) =>
@@ -130,16 +134,20 @@ export const isMediaFile = (file?: File | string): boolean => {
 };
 
 export const isAudioFile = (file?: File | string): boolean => {
-  if (!file) return false;
-  const fileName = typeof file === "string" ? file : file.name;
+  const fileName = getFileProperty(file, "name");
+  if (!fileName) {
+    return false;
+  }
   const extension = fileName.split(".").pop();
   if (!extension) return false;
   return mimeTypes.audio.includes(extension);
 };
 
 export const isVideoFile = (file?: File | string): boolean => {
-  if (!file) return false;
-  const fileName = typeof file === "string" ? file : file.name;
+  const fileName = getFileProperty(file, "name");
+  if (!fileName) {
+    return false;
+  }
   const extension = fileName.split(".").pop();
   if (!extension) return false;
   return mimeTypes.video.includes(extension);

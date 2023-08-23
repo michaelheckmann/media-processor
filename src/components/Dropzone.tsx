@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { DragEvent, ReactNode, useState } from "react";
 import ReactDropzone, { DropzoneProps } from "react-dropzone";
+import Balancer from "react-wrap-balancer";
 
 type Props = {
   handleDrop: (file: File) => void;
@@ -89,9 +90,11 @@ export const Dropzone = ({
               )}
             >
               {isDragActive && (
-                <span>{isValid ? dragActiveText : "Invalid filetype"}</span>
+                <Balancer>
+                  {isValid ? dragActiveText : "Invalid filetype"}
+                </Balancer>
               )}
-              {!isDragActive && <span>{dragInactiveText}</span>}
+              {!isDragActive && <Balancer>{dragInactiveText}</Balancer>}
             </div>
           )}
           {!isDragActive && fileDropped && children}

@@ -14,6 +14,7 @@ export const Root = () => {
     language: "de",
     compression: "medium",
     model: "whisper-large",
+    callbackUrl: "",
     anonymizationStrengthVideo: "8",
     anonymizationStrengthAudio: "3",
     anonymizeFileName: "",

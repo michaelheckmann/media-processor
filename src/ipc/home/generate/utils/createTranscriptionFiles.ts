@@ -1,3 +1,4 @@
+import { toWebVTT } from "@/utils/toWebVTT";
 import type {
   Paragraph,
   PrerecordedTranscriptionResponse,
@@ -146,7 +147,11 @@ export const createTranscriptionFiles = (
   const outDir = getOutDirPath(pathIn, "transcription");
 
   const pathOutVTT = `${outDir}/transcript.vtt`;
-  fs.writeFileSync(pathOutVTT, response.toWebVTT());
+  if (response?.toWebVTT) {
+    fs.writeFileSync(pathOutVTT, response.toWebVTT());
+  } else {
+    fs.writeFileSync(pathOutVTT, toWebVTT(response));
+  }
 
   const pathOutJSON = `${outDir}/transcript.json`;
   fs.writeFileSync(pathOutJSON, JSON.stringify(response, null, 2));

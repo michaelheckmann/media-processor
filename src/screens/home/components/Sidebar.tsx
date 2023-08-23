@@ -1,6 +1,8 @@
 import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
 import { isMediaFile, isVideoFile } from "@/utils/isMediaFile";
+import { isProjectFile } from "@/utils/isProjectFile";
+import { isTranscriptJSON } from "@/utils/isTranscriptJSON";
 import { Dispatch, SetStateAction } from "react";
 import { isValidBlurArea } from "../utils/isValidBlurArea";
 import {
@@ -22,6 +24,7 @@ export type TransformationConfig = {
   language: string;
   compression: CompressionOption;
   model: ModelOption;
+  callbackUrl: string;
   anonymizationStrengthVideo: string;
   anonymizationStrengthAudio: string;
   anonymizeFileName: string;
@@ -52,6 +55,7 @@ export const Sidebar = ({
     language,
     compression,
     model,
+    callbackUrl,
     anonymizationStrengthVideo,
     anonymizationStrengthAudio,
     anonymizeFileName,
@@ -61,11 +65,22 @@ export const Sidebar = ({
     blurArea,
   } = config;
 
+  const mediaFile = isMediaFile(file);
+  const transcriptJSONFile = isTranscriptJSON(file);
+  const projectFile = isProjectFile(file);
+
+  const isValidFileForConfig = (t: TaskOption) =>
+    (mediaFile && t !== "export") ||
+    (projectFile && t === "export") ||
+    (transcriptJSONFile && t === "transcribe");
+
   const showOptions = task !== "";
   const showTrimTo = task === "compress" || task === "anonymize";
-  const showLanguage = task === "transcribe";
+  const showLanguage = task === "transcribe" && !transcriptJSONFile;
   const showCompression = task === "compress";
-  const showModel = task === "transcribe";
+  const showModel = task === "transcribe" && !transcriptJSONFile;
+  const showCallbackUrl = task === "transcribe" && !transcriptJSONFile;
+  const showTranscriptFileText = task === "transcribe" && transcriptJSONFile;
   const showAnonymizationStrengthVideo =
     task === "anonymize" && isVideoFile(file);
   const showAnonymizationStrengthAudio = task === "anonymize";
@@ -75,17 +90,13 @@ export const Sidebar = ({
   const showExportOptions = task === "export";
   const showSpeakerMap = task === "export" && exportOption === "notion";
 
-  const mediaFile = isMediaFile(file);
-  const isValidFileForConfig =
-    (mediaFile && task !== "export") || (!mediaFile && task === "export");
-
   const disableButton =
     // Disable during processing
     processingState === "processing" ||
     // Disable if there is no file
     !file ||
     // Disable if the file that was dropped is not valid for the current config
-    !isValidFileForConfig ||
+    !isValidFileForConfig(task) ||
     // Disable if there is no task
     task === "" ||
     // Disable if there is no reduaction config and task is redact
@@ -122,19 +133,15 @@ export const Sidebar = ({
           <Select
             label="Task"
             options={TASKS.map((t) => {
-              if (t.value === "") {
+              if (t.value === "" || !file) {
                 return t;
               }
-              if (!file) {
+
+              if (isValidFileForConfig(t.value)) {
                 return t;
-              }
-              if (t.value === "export" && mediaFile) {
+              } else {
                 return { ...t, disabled: true };
               }
-              if (t.value !== "export" && !mediaFile) {
-                return { ...t, disabled: true };
-              }
-              return t;
             })}
             value={task}
             onChange={({ target }) => onConfigChange("task", target.value)}
@@ -196,6 +203,26 @@ export const Sidebar = ({
                     onConfigChange("model", target.value)
                   }
                 />
+              )}
+              {showCallbackUrl && (
+                <Input
+                  label="Callback URL"
+                  link="https://developers.deepgram.com/docs/using-callbacks-to-return-transcripts-to-your-server"
+                  type="url"
+                  optional
+                  placeholder="Enter a URL"
+                  value={callbackUrl}
+                  tooltip="Enter the URL where you want to receive the transcript. Deepgram will send a POST request to this URL with the transcript as the body of the request. You can use a service like https://make.com/ for your callback URL."
+                  onChange={({ target }) =>
+                    onConfigChange("callbackUrl", target.value)
+                  }
+                />
+              )}
+              {showTranscriptFileText && (
+                <div className="font-mono select-none text-stone-500 text-2xs">
+                  No further configuration necessary to transform
+                  transcription.json
+                </div>
               )}
               {showAnonymizationStrengthVideo && (
                 <Input
