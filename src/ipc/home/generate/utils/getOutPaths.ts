@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { addDotToExt } from "./addDotToExt";
 import { getPseudonym } from "./getPseudonym";
 
 /**
@@ -70,26 +71,35 @@ export const getOutDirPath = (filePath: string, subFolder?: string) => {
 };
 
 /**
- * The function `getOutFilePath` takes a file path and an extension, and returns a new file path with
- * the extension appended to the file name.
- * @param {string} filePath - The `filePath` parameter is a string that represents the path of the file
- * for which you want to generate a new output file path.
+ * The `getOutFilePath` function takes a file path, an extension, and optional options, and returns a
+ * new file path with an anonymized file name, the specified extension, and the original file
+ * extension.
+ * @param {string} filePath - The `filePath` parameter is a string that represents the path of the
+ * input file.
  * @param {string} extension - The `extension` parameter is a string that represents the desired
  * extension for the output file.
- * @returns the output file path, which is a combination of the output directory path and the new file
- * name.
+ * @param options - The `options` parameter is an optional object that can have two properties:
+ * `anonymization` and `fileExtension`. The `anonymization` property is a string that represents the
+ * part of the file name that needs to be anonymized. The `fileExtension` property is a string that
+ * represents the file extension of the input file. If the `fileExtension` property is not provided,
+ * the function will use the file extension of the input file.
+ * @returns a string representing the output file path.
  */
 export const getOutFilePath = (
   filePath: string,
   extension: string,
-  anonymization?: string
+  options: {
+    anonymization?: string;
+    fileExtension?: string;
+  } = {}
 ) => {
   const ourDirectory = getOutDirPath(filePath);
 
   const fileName = getStrippedFileName(filePath);
-  const fileExtension = path.extname(filePath);
+  const fileExtension =
+    addDotToExt(options.fileExtension) ?? path.extname(filePath);
   const newFileName =
-    anonymizeFileName(fileName, anonymization) +
+    anonymizeFileName(fileName, options.anonymization) +
     ` [${extension}]` +
     fileExtension;
 

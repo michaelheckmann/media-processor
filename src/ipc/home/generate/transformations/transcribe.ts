@@ -40,7 +40,7 @@ export const transcribeFile = async (
     diarize: true,
     language: config.language,
     model: config.model,
-    callback: config.callbackUrl,
+    callback: config.callbackUrl ?? undefined,
   });
 
   if (response.err_code) {

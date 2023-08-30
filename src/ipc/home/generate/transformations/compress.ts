@@ -19,9 +19,9 @@ import { getOutFilePath } from "../utils/getOutPaths";
  */
 const compressAudio = (pathIn: string, config: TransformationConfig) => {
   const compressionMap = {
-    low: "64k",
+    low: "128k",
     medium: "96k",
-    high: "128k",
+    high: "64k",
   };
   const compression = compressionMap[config.compression];
   return ffmpeg(pathIn).audioBitrate(compression);
@@ -110,7 +110,14 @@ export const compressTransformation = async (
   pathIn: string,
   config: TransformationConfig
 ) => {
-  const pathOut = getOutFilePath(pathIn, "compressed");
+  const mimeType = lookup(pathIn);
+  const isAudioFile = mimeType && mimeType?.includes("audio");
+
+  const pathOut = getOutFilePath(pathIn, "compressed", {
+    // We want to make sure to use ogg for audio files
+    // as the compression is much better than other formats
+    fileExtension: isAudioFile ? "ogg" : undefined,
+  });
   await compressFile(pathIn, pathOut, config);
   try {
     // Open the file in the IINA app

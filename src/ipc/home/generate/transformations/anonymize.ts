@@ -108,11 +108,9 @@ export const anonymizeTransformation = async (
   pathIn: string,
   config: TransformationConfig
 ) => {
-  const pathOut = getOutFilePath(
-    pathIn,
-    "anonymized",
-    config.anonymizeFileName
-  );
+  const pathOut = getOutFilePath(pathIn, "anonymized", {
+    anonymization: config.anonymizeFileName,
+  });
   await anonymizeFile(pathIn, pathOut, config);
   try {
     // Open the file in the IINA app
