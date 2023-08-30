@@ -81,7 +81,7 @@ The project contains the `ner` folder in the root of the repository. Since the s
 python3 --version
 ```
 
-Feel free to change or adjust the script to your liking.
+The transcription process produces a `sentences.txt` file which is optimized for the NER script. The NER script will read the `sentences.txt` file and the `ner` folder and produce a `ner-analysis.txt` file which contains the identified entities.
 
 ### Redaction
 
