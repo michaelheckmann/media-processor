@@ -2,7 +2,10 @@ import { ipcMainElectronStoreGet } from "@/ipc/shared/store";
 import { TransformationConfig } from "@/screens/home/components/Sidebar";
 import { isTranscriptJSON } from "@/utils/isTranscriptJSON";
 import { Deepgram } from "@deepgram/sdk";
-import { PrerecordedTranscriptionResponse } from "@deepgram/sdk/dist/types";
+import {
+  PrerecordedTranscriptionOptions,
+  PrerecordedTranscriptionResponse,
+} from "@deepgram/sdk/dist/types";
 import { spawnSync } from "child_process";
 import fs from "fs";
 import { lookup } from "mime-types";
@@ -31,17 +34,25 @@ export const transcribeFile = async (
 
   const buffer = fs.readFileSync(pathIn);
   const audioSource = { buffer, mimetype };
-  console.log("Transcribing...");
 
-  const response = await deepgram.transcription.preRecorded(audioSource, {
+  const options: PrerecordedTranscriptionOptions = {
     punctuate: true,
     utterances: true,
     paragraphs: true,
     diarize: true,
     language: config.language,
     model: config.model,
-    callback: config.callbackUrl ?? undefined,
-  });
+  };
+
+  if (config.callbackUrl) {
+    options.callbackUrl = config.callbackUrl;
+  }
+
+  console.log("Transcribing...");
+  const response = await deepgram.transcription.preRecorded(
+    audioSource,
+    options
+  );
 
   if (response.err_code) {
     throw new Error(response.err_msg);
