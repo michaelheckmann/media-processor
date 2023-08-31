@@ -45,7 +45,7 @@ export const transcribeFile = async (
   };
 
   if (config.callbackUrl) {
-    options.callbackUrl = config.callbackUrl;
+    options.callback = config.callbackUrl;
   }
 
   console.log("Transcribing...");
