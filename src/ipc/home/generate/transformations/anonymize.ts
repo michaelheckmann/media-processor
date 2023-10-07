@@ -114,7 +114,7 @@ export const anonymizeTransformation = async (
   await anonymizeFile(pathIn, pathOut, config);
   try {
     // Open the file in the IINA app
-    spawnSync("open", ["-a", "IINA", pathOut]);
+    config.openFile && spawnSync("open", ["-a", "IINA", pathOut]);
   } catch (error) {
     console.log("Error opening file in IINA");
   }

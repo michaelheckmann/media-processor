@@ -1,3 +1,4 @@
+import { Checkbox } from "@/components/Checkbox";
 import { Input } from "@/components/Input";
 import { Select } from "@/components/Select";
 import { isMediaFile, isVideoFile } from "@/utils/isMediaFile";
@@ -20,6 +21,7 @@ import { ProcessingState } from "./Root";
 
 export type TransformationConfig = {
   task: TaskOption;
+  openFile: boolean;
   trimTo: string;
   language: string;
   compression: CompressionOption;
@@ -51,6 +53,7 @@ export const Sidebar = ({
 }: Props) => {
   const {
     task,
+    openFile,
     trimTo,
     language,
     compression,
@@ -78,6 +81,7 @@ export const Sidebar = ({
     (transcriptJSONFile && t === "transcribe");
 
   const showOptions = task !== "";
+  const showOpenFile = task !== "";
   const showTrimTo = task === "compress" || task === "anonymize";
   const showLanguage = task === "transcribe" && !transcriptJSONFile;
   const showCompression = task === "compress";
@@ -105,7 +109,7 @@ export const Sidebar = ({
     // Disable if there is no reduaction config and task is redact
     (!redactionConfigFile.length && task === "redact") ||
     // Disable if the user tries to use the 'nova' model with a language other than 'en'
-    (language !== "en" && model === "nova") ||
+    (language !== "en" && model.includes("nova")) ||
     // Disable if the user tries to export to notion but the speaker map is invalid
     (task === "export" &&
       exportOption === "notion" &&
@@ -307,6 +311,15 @@ export const Sidebar = ({
                   value={speakerMap}
                   onChange={({ target }) =>
                     onConfigChange("speakerMap", target.value)
+                  }
+                />
+              )}
+              {showOpenFile && (
+                <Checkbox
+                  label="Open file after the transformation"
+                  checked={openFile}
+                  onChange={({ target }) =>
+                    onConfigChange("openFile", target.checked)
                   }
                 />
               )}

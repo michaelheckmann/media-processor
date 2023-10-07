@@ -1,6 +1,6 @@
 {
   "name": "media-processor",
-  "productName": "media-processor",
+  "productName": "Media Processor",
   "version": "1.0.0",
   "description": "Media Processor",
   "main": ".webpack/main",

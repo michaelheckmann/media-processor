@@ -52,10 +52,16 @@ input {
 
   user-select: none;
 
-  cursor: default;
   transition: background-color 0.2s ease-in-out;
 
-  @apply outline-none w-full px-2 py-1.5 text-xs rounded-md border-1 border-stone-700 placeholder:text-stone-400;
+  @apply text-xs outline-none placeholder:text-stone-400;
+}
+
+select,
+button,
+input:not([type="checkbox"]) {
+  cursor: default;
+  @apply w-full px-2 py-1.5 rounded-md border-1 border-stone-700;
 }
 
 select:hover,

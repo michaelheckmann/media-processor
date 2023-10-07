@@ -11,6 +11,7 @@ export const Root = () => {
   const [config, setConfig] = useState<TransformationConfig>({
     task: "",
     trimTo: "",
+    openFile: true,
     language: "de",
     compression: "medium",
     model: "whisper-large",

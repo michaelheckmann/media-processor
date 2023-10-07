@@ -92,6 +92,6 @@ export const transcribeTransformation = async (
   } else {
     const outDir = getOutDirPath(pathIn, "transcription");
     await transcribeFile(pathIn, config);
-    spawnSync("open", [outDir]);
+    config.openFile && spawnSync("open", [outDir]);
   }
 };

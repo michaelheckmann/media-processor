@@ -101,5 +101,5 @@ export const exportTransformation = async (
       `${s3ExportDirPath}/${transcriptionFile}`
     );
   }
-  spawnSync("open", [outDirPath]);
+  config.openFile && spawnSync("open", [outDirPath]);
 };
