@@ -70,10 +70,10 @@ export const Sidebar = ({
 
   const mediaFile = isMediaFile(file);
   const transcriptJSONFile = isTranscriptJSON(file);
-  console.log("transcriptJSONFile:", transcriptJSONFile);
+  // console.log("transcriptJSONFile:", transcriptJSONFile);
 
   const projectFile = isProjectFile(file);
-  console.log("projectFile:", projectFile);
+  // console.log("projectFile:", projectFile);
 
   const isValidFileForConfig = (t: TaskOption) =>
     (mediaFile && t !== "export") ||
@@ -168,11 +168,11 @@ export const Sidebar = ({
                   optional
                   placeholder="Enter a number"
                   value={trimTo}
-                  onChange={({ target }) => {
-                    const isEmpty = target.value === "";
-                    const number = Number(target.value);
+                  onChange={(value) => {
+                    const isEmpty = value === "";
+                    const number = Number(value);
                     if (isEmpty || number > 0) {
-                      onConfigChange("trimTo", target.value);
+                      onConfigChange("trimTo", value);
                     }
                   }}
                 />
@@ -185,9 +185,7 @@ export const Sidebar = ({
                   placeholder="Enter a language code"
                   max={2}
                   value={language}
-                  onChange={({ target }) =>
-                    onConfigChange("language", target.value)
-                  }
+                  onChange={(value) => onConfigChange("language", value)}
                 />
               )}
               {showCompression && (
@@ -220,9 +218,7 @@ export const Sidebar = ({
                   placeholder="Enter a URL"
                   value={callbackUrl}
                   tooltip="Enter the URL where you want to receive the transcript. Deepgram will send a POST request to this URL with the transcript as the body of the request. You can use a service like https://make.com/ for your callback URL."
-                  onChange={({ target }) =>
-                    onConfigChange("callbackUrl", target.value)
-                  }
+                  onChange={(value) => onConfigChange("callbackUrl", value)}
                 />
               )}
               {showTranscriptFileText && (
@@ -239,8 +235,8 @@ export const Sidebar = ({
                   min={0}
                   value={anonymizationStrengthVideo}
                   tooltip="We recommend a value between 0 and 10. The higher the value, the stronger the blur."
-                  onChange={({ target }) =>
-                    onConfigChange("anonymizationStrengthVideo", target.value)
+                  onChange={(value) =>
+                    onConfigChange("anonymizationStrengthVideo", value)
                   }
                 />
               )}
@@ -250,11 +246,9 @@ export const Sidebar = ({
                   type="text"
                   optional
                   placeholder="Enter a text"
-                  tooltip="Enter the configuration of the area you want to blur. The format is 'w:h:x:y' where x and y are the coordinates of the top left corner of the area, w is the width and h is the height. For example, '400:220:760:0' will blur the area starting at x=760 and y=0, with a width of 400 and a height of 220."
+                  tooltip="Enter the configuration of the area you want to blur. The format is 'w:h:x:y' where x and y are the coordinates of the top left corner of the area, w is the width and h is the height. For example, '20%:20%:40%:0%' will blur the area starting at x=40% and y=0, with a width of 20% and a height of 20%. You can use percentages or pixels."
                   value={blurArea}
-                  onChange={({ target }) =>
-                    onConfigChange("blurArea", target.value)
-                  }
+                  onChange={(value) => onConfigChange("blurArea", value)}
                 />
               )}
               {showAnonymizationStrengthAudio && (
@@ -265,8 +259,8 @@ export const Sidebar = ({
                   min={0}
                   value={anonymizationStrengthAudio}
                   tooltip="We recommend a value between 0 and 4. The higher the value, the stronger the pitch shift."
-                  onChange={({ target }) =>
-                    onConfigChange("anonymizationStrengthAudio", target.value)
+                  onChange={(value) =>
+                    onConfigChange("anonymizationStrengthAudio", value)
                   }
                 />
               )}
@@ -278,8 +272,8 @@ export const Sidebar = ({
                   placeholder="Enter a text"
                   tooltip="Enter the text you want to anonymize in the file name. Entering a text like 'michael' will turn a filname like 'michael__001.mp4' into 'blue_flamingo__001.mp4'"
                   value={anonymizeFileName}
-                  onChange={({ target }) =>
-                    onConfigChange("anonymizeFileName", target.value)
+                  onChange={(value) =>
+                    onConfigChange("anonymizeFileName", value)
                   }
                 />
               )}
@@ -309,9 +303,7 @@ export const Sidebar = ({
                   placeholder="Enter a configuration"
                   tooltip="Enter the names of the speakers. It should follow the format '0:john, 1:mary'."
                   value={speakerMap}
-                  onChange={({ target }) =>
-                    onConfigChange("speakerMap", target.value)
-                  }
+                  onChange={(value) => onConfigChange("speakerMap", value)}
                 />
               )}
               {showOpenFile && (

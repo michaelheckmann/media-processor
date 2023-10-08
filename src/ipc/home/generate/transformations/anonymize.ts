@@ -1,9 +1,11 @@
 import { TransformationConfig } from "@/screens/home/components/Sidebar";
 import { spawnSync } from "child_process";
-import ffmpeg from "fluent-ffmpeg";
+import ffmpeg, { FfprobeData } from "fluent-ffmpeg";
 import { lookup } from "mime-types";
 import { onEnd, onError, onProgress } from "../utils/ffmpegOptions";
+import { ffprobePromise } from "../utils/ffprobePromise";
 import { getOutFilePath } from "../utils/getOutPaths";
+import { parseBlurArea } from "../utils/parseBlurArea";
 
 /**
  * The `anonymizeAudio` function takes in a file path and a configuration object, and returns an ffmpeg
@@ -31,18 +33,28 @@ const anonymizeAudio = (pathIn: string, config: TransformationConfig) => {
  * the input video file that needs to be anonymized.
  * @param {TransformationConfig} config - The `config` parameter is an object that contains the
  * configuration for the video anonymization.
+ * @param {FfprobeData} metadata - The `metadata` parameter is an object that contains metadata about
+ * the video file. It is of type `FfprobeData`, and it contains properties such as `streams`, which is
+ * an array of objects that contain information about the video streams in the video file.
  * @returns an instance of the `anonymizeAudio` function with some video filters and output options
  * applied.
  */
-const anonymizeVideo = (pathIn: string, config: TransformationConfig) => {
-  const [_, __, x, y] = config.blurArea.split(":");
-
+const anonymizeVideo = (
+  pathIn: string,
+  config: TransformationConfig,
+  metadata: FfprobeData
+) => {
   const anonymization = parseFloat(config.anonymizationStrengthVideo);
+
+  const blurArea = parseBlurArea(config.blurArea, metadata);
+  const [_, __, x, y] = blurArea;
 
   const blurCommand = config.blurArea
     ? anonymizeAudio(pathIn, config)
         .complexFilter(
-          `[0:v]crop=${config.blurArea},avgblur=${anonymization}[fg];[0:v][fg]overlay=${x}:${y}[v]`
+          `[0:v]crop=${blurArea.join(
+            ":"
+          )},avgblur=${anonymization}[fg];[0:v][fg]overlay=${x}:${y}[v]`
         )
         .outputOptions(["-map [v]", "-map 0:a"])
     : anonymizeAudio(pathIn, config).videoFilter(`boxblur=${anonymization}`);
@@ -72,11 +84,12 @@ const anonymizeFile = async (
 
   const mimeType = lookup(pathIn);
   const isAudioFile = mimeType && mimeType?.includes("audio");
+  const metadata = await ffprobePromise(pathIn);
 
   return new Promise<void>((resolve, reject) => {
     let ffmpegCommand = isAudioFile
       ? anonymizeAudio(pathIn, config)
-      : anonymizeVideo(pathIn, config);
+      : anonymizeVideo(pathIn, config, metadata);
 
     ffmpegCommand =
       config.trimTo === ""

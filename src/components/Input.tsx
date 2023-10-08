@@ -1,7 +1,10 @@
-import { InputHTMLAttributes, useEffect, useState } from "react";
+import { InputHTMLAttributes, useState } from "react";
 import { InputWrapper, InputWrapperProps } from "./InputWrapper";
 
-type Props = InputHTMLAttributes<HTMLInputElement> & InputWrapperProps;
+type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> &
+  InputWrapperProps & {
+    onChange: (value: string) => void;
+  };
 
 export const Input = ({
   label,
@@ -10,13 +13,14 @@ export const Input = ({
   tooltip,
   onKeyDown,
   value,
+  onChange,
   ...rest
 }: Props) => {
   const [localValue, setLocalValue] = useState(value?.toString() ?? "");
-
-  useEffect(() => {
-    setLocalValue(value?.toString() ?? "");
-  }, [value]);
+  const updateVal = (val: string | number) => {
+    setLocalValue(val?.toString() ?? "");
+    onChange(val.toString());
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (rest.type === "number") {
@@ -26,20 +30,17 @@ export const Input = ({
       if (rest.max && Number(localValue) > Number(rest.max)) {
         return;
       }
+
       if (event.key === "ArrowUp") {
         event.preventDefault();
-        setLocalValue((prevValue) => {
-          const newValue = Number(prevValue) + 1;
-          rest.onChange?.({ target: { value: newValue } } as any);
-          return newValue.toString();
-        });
+        const newValue = (Number(localValue) + 1).toString();
+        updateVal(newValue);
+        setLocalValue(newValue);
       } else if (event.key === "ArrowDown") {
         event.preventDefault();
-        setLocalValue((prevValue) => {
-          const newValue = Number(prevValue) - 1;
-          rest.onChange?.({ target: { value: newValue } } as any);
-          return newValue.toString();
-        });
+        const newValue = (Number(localValue) - 1).toString();
+        updateVal(newValue);
+        setLocalValue(newValue);
       }
     }
     onKeyDown?.(event);
@@ -47,7 +48,14 @@ export const Input = ({
 
   return (
     <InputWrapper {...{ label, link, tooltip, optional }}>
-      <input value={localValue} onKeyDown={handleKeyDown} {...rest} />
+      <input
+        value={localValue}
+        onKeyDown={handleKeyDown}
+        onChange={(e) => {
+          updateVal(e.target.value);
+        }}
+        {...rest}
+      />
     </InputWrapper>
   );
 };
