@@ -54,7 +54,7 @@ export const COMPRESSIONS: SideBarOptions<CompressionOption> = [
   },
 ];
 
-export type ModelOption = "whisper-large" | "nova" | "nova-2-ea";
+export type ModelOption = "whisper-large" | "nova" | "nova-2";
 export const MODELS: SideBarOptions<ModelOption> = [
   {
     label: "Whisper",
@@ -65,8 +65,8 @@ export const MODELS: SideBarOptions<ModelOption> = [
     value: "nova",
   },
   {
-    label: "Nova 2 EA",
-    value: "nova-2-ea",
+    label: "Nova 2",
+    value: "nova-2",
   },
 ];
 

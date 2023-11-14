@@ -14,7 +14,7 @@ export const Root = () => {
     openFile: true,
     language: "de",
     compression: "medium",
-    model: "whisper-large",
+    model: "nova-2",
     callbackUrl: "",
     anonymizationStrengthVideo: "8",
     anonymizationStrengthAudio: "3",
