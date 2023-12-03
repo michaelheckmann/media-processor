@@ -108,8 +108,6 @@ export const Sidebar = ({
     task === "" ||
     // Disable if there is no reduaction config and task is redact
     (!redactionConfigFile.length && task === "redact") ||
-    // Disable if the user tries to use the 'nova' model with a language other than 'en'
-    (language !== "en" && model.includes("nova")) ||
     // Disable if the user tries to export to notion but the speaker map is invalid
     (task === "export" &&
       exportOption === "notion" &&
