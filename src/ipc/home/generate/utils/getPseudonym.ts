@@ -51,6 +51,7 @@ const excludedAdjectives = [
   "thirsty",
   "tory",
   "xenophobic",
+  "awful",
 ];
 
 /**

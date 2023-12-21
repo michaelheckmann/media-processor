@@ -208,19 +208,27 @@ const getRedactedTranscript = (
 /**
  * The function creates a redaction command based on a given configuration of timestamps.
  * @param {RedactionTimestamps} redactionConfig - The `redactionConfig` parameter is an array of
- * objects that contain the following properties:
+ * objects
  * @returns The function `createRedactionCommand` returns an array of strings. Each string in the array
  * represents a redaction command that can be used to redact audio timestamps based on the provided
  * `redactionConfig`.
  */
 function createRedactionCommand(redactionConfig: RedactionTimestamps) {
   return redactionConfig.map((config) => {
-    const startMS = Math.floor(config.start * 1000);
-    const endMS = Math.ceil(config.end * 1000);
+    console.log("returnredactionConfig.map ~ config:", config);
+
+    // Start and end 200ms early / late to make sure that
+    // all the audio is redacted
+    const threshold = 0.2;
+    const start = config.start - threshold;
+    const end = config.end + threshold;
+
+    const startMS = Math.floor(start * 1000);
+    const endMS = Math.ceil(end * 1000);
     const durationMS = endMS - startMS;
 
-    const startS = Math.floor(config.start * 1000) / 1000;
-    const endS = Math.ceil(config.end * 1000) / 1000;
+    const startS = Math.floor(start * 1000) / 1000;
+    const endS = Math.ceil(end * 1000) / 1000;
     return `volume=enable='between(t,${startS},${endS})':volume=0[main];sine=d=${durationMS}ms:f=800, adelay=${startMS}ms,volume=0.1[beep];[main][beep]amix=inputs=2:normalize=0`;
   });
 }
