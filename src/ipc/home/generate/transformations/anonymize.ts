@@ -16,12 +16,21 @@ import { parseBlurArea } from "../utils/parseBlurArea";
  * configuration for the audio transformation. It likely includes properties such as
  * `anonymizationStrengthAudio`, which is a numerical value representing the strength of the
  * anonymization process.
+ * @param {FfprobeData} metadata - The `metadata` parameter is an object that contains metadata about
+ * the video file. It is of type `FfprobeData`, and it contains properties such as `streams`, which is
+ * an array of objects that contain information about the video streams in the video file.
  * @returns a modified ffmpeg command that applies audio filters for anonymization.
  */
-const anonymizeAudio = (pathIn: string, config: TransformationConfig) => {
+const anonymizeAudio = (
+  pathIn: string,
+  config: TransformationConfig,
+  metadata: FfprobeData
+) => {
+  const audioStream = metadata.streams.find((s) => s.codec_type === "audio");
+  const { sample_rate } = audioStream;
   const anonymization = 10 - parseFloat(config.anonymizationStrengthAudio);
   return ffmpeg(pathIn).audioFilters([
-    `asetrate=48000*${anonymization / 10}`,
+    `asetrate=${sample_rate}*${anonymization / 10}`,
     `atempo=${10 / anonymization}`,
   ]);
 };
@@ -50,14 +59,16 @@ const anonymizeVideo = (
   const [_, __, x, y] = blurArea;
 
   const blurCommand = config.blurArea
-    ? anonymizeAudio(pathIn, config)
+    ? anonymizeAudio(pathIn, config, metadata)
         .complexFilter(
           `[0:v]crop=${blurArea.join(
             ":"
           )},avgblur=${anonymization}[fg];[0:v][fg]overlay=${x}:${y}[v]`
         )
         .outputOptions(["-map [v]", "-map 0:a"])
-    : anonymizeAudio(pathIn, config).videoFilter(`boxblur=${anonymization}`);
+    : anonymizeAudio(pathIn, config, metadata).videoFilter(
+        `boxblur=${anonymization}`
+      );
 
   return blurCommand.outputOptions(["-vcodec libx265", "-preset ultrafast"]);
 };
@@ -88,7 +99,7 @@ const anonymizeFile = async (
 
   return new Promise<void>((resolve, reject) => {
     let ffmpegCommand = isAudioFile
-      ? anonymizeAudio(pathIn, config)
+      ? anonymizeAudio(pathIn, config, metadata)
       : anonymizeVideo(pathIn, config, metadata);
 
     ffmpegCommand =
@@ -97,6 +108,7 @@ const anonymizeFile = async (
         : ffmpegCommand.setDuration(config.trimTo);
 
     ffmpegCommand
+      .on("start", (cmdline) => console.log(cmdline))
       .on("codecData", (data) => {
         totalTime = parseInt(data.duration.replace(/:/g, ""));
       })

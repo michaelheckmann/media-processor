@@ -5,7 +5,8 @@ export const parseBlurArea = (
   { streams }: FfprobeData
 ) => {
   const blurArea = blurAreaString.split(":");
-  const { width, height } = streams[0];
+  const videoStream = streams.find((s) => s.codec_type === "video");
+  const { width, height } = videoStream;
 
   return blurArea.map((v, i) => {
     if (v.includes("%")) {
